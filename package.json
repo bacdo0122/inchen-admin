@@ -1,0 +1,23 @@
+{
+  "name": "inchem-minhhien",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Website Sơn INCHEM (Minh Hiền) — monorepo (web + admin + api)",
+  "packageManager": "pnpm@10.17.1",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "api:dev": "pnpm --filter @inchem/api start:dev",
+    "api:migrate": "pnpm --filter @inchem/api prisma:migrate",
+    "api:seed": "pnpm --filter @inchem/api prisma:seed"
+  },
+  "devDependencies": {
+    "turbo": "^2.3.3"
+  }
+}

@@ -1,0 +1,63 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/**
+ * Design tokens — khung admin trung tính (light).
+ *
+ * --brand* = MÀU NHẤN THƯƠNG HIỆU (placeholder). Khi frontend-dev trích token
+ * từ Figma của web public, chỉ đổi 3 dòng --brand / --brand-fg / --brand-muted.
+ * Các màu trạng thái (đỏ/vàng/xanh cho lead & nội dung) nằm trong component badge.
+ */
+:root {
+  --surface: 210 20% 98%;
+  --panel: 0 0% 100%;
+  --border: 214 20% 90%;
+  --muted: 210 20% 96%;
+  --muted-fg: 215 16% 47%;
+  --fg: 222 30% 16%;
+
+  --brand: 211 90% 42%;
+  --brand-fg: 0 0% 100%;
+  --brand-muted: 211 90% 96%;
+}
+
+* {
+  border-color: hsl(var(--border));
+}
+
+body {
+  background-color: hsl(var(--surface));
+  color: hsl(var(--fg));
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Vùng nội dung tin tức render từ rich text (xem lại bản nháp trong admin). */
+.prose-admin :where(h1, h2, h3) {
+  font-weight: 700;
+  line-height: 1.25;
+  margin: 1em 0 0.5em;
+}
+.prose-admin h1 { font-size: 1.5rem; }
+.prose-admin h2 { font-size: 1.25rem; }
+.prose-admin h3 { font-size: 1.1rem; }
+.prose-admin p { margin: 0.5em 0; }
+.prose-admin ul { list-style: disc; padding-left: 1.25rem; margin: 0.5em 0; }
+.prose-admin ol { list-style: decimal; padding-left: 1.25rem; margin: 0.5em 0; }
+.prose-admin a { color: hsl(var(--brand)); text-decoration: underline; }
+.prose-admin img { max-width: 100%; height: auto; border-radius: 0.5rem; margin: 0.75em 0; }
+.prose-admin blockquote {
+  border-left: 3px solid hsl(var(--border));
+  padding-left: 1rem;
+  color: hsl(var(--muted-fg));
+  margin: 0.75em 0;
+}
+
+/* Placeholder cho Tiptap khi rỗng */
+.tiptap p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  color: hsl(var(--muted-fg));
+  float: left;
+  height: 0;
+  pointer-events: none;
+}

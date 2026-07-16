@@ -1,0 +1,15 @@
+# Cấu hình Railway cho service API (apps/api) — pnpm monorepo.
+# Service này đặt Root Directory = "" (gốc repo) để cài được workspace @inchem/shared.
+# web & admin deploy trên Vercel (không dùng file này).
+
+[build]
+builder = "NIXPACKS"
+buildCommand = "pnpm install --frozen-lockfile && pnpm --filter @inchem/api prisma:generate && pnpm --filter @inchem/api build"
+
+[deploy]
+# Chạy migration DB trước mỗi lần deploy (idempotent, an toàn khi 1 instance).
+preDeployCommand = "pnpm --filter @inchem/api prisma:deploy"
+# start:prod = node dist/main.js, chạy trong apps/api. App đọc PORT từ env của Railway.
+startCommand = "pnpm --filter @inchem/api start:prod"
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
