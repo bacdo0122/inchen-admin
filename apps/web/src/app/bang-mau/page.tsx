@@ -6,7 +6,7 @@ import { PageBanner } from '@/components/layout/page-banner';
 import { ColorsExplorer } from '@/components/color/colors-explorer';
 import { EmptyNote } from '@/components/ui/empty-note';
 
-export const revalidate = 60;
+export const revalidate = 30;
 
 export const metadata: Metadata = {
   title: 'Bảng màu sơn gỗ INCHEM',

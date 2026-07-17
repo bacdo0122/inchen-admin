@@ -10,7 +10,7 @@ import { Container } from '@/components/ui/container';
 import { Breadcrumb } from '@/components/layout/breadcrumb';
 import { formatDate, stripHtml, truncate } from '@/lib/utils';
 
-export const revalidate = 60;
+export const revalidate = 30;
 
 type Params = { params: Promise<{ slug: string }> };
 

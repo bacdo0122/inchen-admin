@@ -20,8 +20,8 @@ export const metadata: Metadata = {
   openGraph: { url: SITE_URL },
 };
 
-// ISR theo thời gian: trang chủ tự làm mới sau mỗi 60 giây.
-export const revalidate = 60;
+// ISR theo thời gian: trang chủ tự làm mới sau mỗi 30 giây.
+export const revalidate = 30;
 
 async function safe<T>(p: Promise<T>, fallback: T): Promise<T> {
   try {

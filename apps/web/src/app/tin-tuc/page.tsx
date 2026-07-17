@@ -9,7 +9,7 @@ import { NewsCard } from '@/components/news/news-card';
 import { EmptyNote } from '@/components/ui/empty-note';
 import { cn } from '@/lib/utils';
 
-export const revalidate = 60;
+export const revalidate = 30;
 
 export const metadata: Metadata = {
   title: 'Tin tức & sự kiện',

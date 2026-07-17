@@ -47,7 +47,12 @@ export function ProductCard({ product }: { product: Product }) {
           </div>
         )}
 
-        <ButtonLink href="/lien-he" variant="ghost" size="sm" className="mt-auto self-start bg-indigo text-white hover:brightness-110">
+        <ButtonLink
+          href="/lien-he"
+          variant="ghost"
+          size="sm"
+          className="mt-auto self-start bg-indigo text-white transition-colors hover:bg-indigo/90 hover:shadow-md"
+        >
           Liên hệ
         </ButtonLink>
       </div>
