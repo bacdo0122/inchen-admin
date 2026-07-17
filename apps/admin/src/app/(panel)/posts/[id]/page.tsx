@@ -30,7 +30,7 @@ export default async function EditPostPage({ params }: { params: Promise<{ id: s
       <PageHeader
         title="Sửa bài viết"
         description={`/${post.slug}`}
-        action={<DeletePostButton id={post.id} slug={post.slug} title={post.title} redirectTo="/posts" />}
+        action={<DeletePostButton id={post.id} title={post.title} redirectTo="/posts" />}
       />
       <PostForm post={post} />
     </>

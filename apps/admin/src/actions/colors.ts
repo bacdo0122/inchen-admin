@@ -3,7 +3,6 @@
 import { revalidatePath } from 'next/cache';
 import type { ColorTone } from '@inchem/shared';
 import { apiFetch, mutate } from '@/lib/mutate';
-import { revalidateWeb } from '@/lib/revalidate';
 import type { Color } from '@/lib/types';
 
 export interface ColorInput {
@@ -30,7 +29,6 @@ export async function createColorAction(input: ColorInput) {
   const res = await mutate(() => apiFetch<Color>('/colors', { method: 'POST', body: clean(input) }));
   if (res.ok) {
     revalidatePath('/colors');
-    await revalidateWeb(['colors']);
   }
   return res;
 }
@@ -41,7 +39,6 @@ export async function updateColorAction(id: string, input: ColorInput) {
   );
   if (res.ok) {
     revalidatePath('/colors');
-    await revalidateWeb(['colors']);
   }
   return res;
 }
@@ -50,7 +47,6 @@ export async function deleteColorAction(id: string) {
   const res = await mutate(() => apiFetch<{ success: boolean }>(`/colors/${id}`, { method: 'DELETE' }));
   if (res.ok) {
     revalidatePath('/colors');
-    await revalidateWeb(['colors']);
   }
   return res;
 }

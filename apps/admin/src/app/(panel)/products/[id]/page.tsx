@@ -30,7 +30,7 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
       <PageHeader
         title="Sửa sản phẩm"
         description={`/${product.slug}`}
-        action={<DeleteProductButton id={product.id} slug={product.slug} name={product.name} redirectTo="/products" />}
+        action={<DeleteProductButton id={product.id} name={product.name} redirectTo="/products" />}
       />
       <ProductForm product={product} />
     </>

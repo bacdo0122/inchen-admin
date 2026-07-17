@@ -13,7 +13,5 @@ function required(name: string, value: string | undefined): string {
 
 export const env = {
   apiBaseUrl: required('API_BASE_URL', process.env.API_BASE_URL).replace(/\/$/, ''),
-  webRevalidateUrl: process.env.WEB_REVALIDATE_URL?.replace(/\/$/, '') || '',
-  webRevalidateSecret: process.env.WEB_REVALIDATE_SECRET || '',
   isProd: process.env.NODE_ENV === 'production',
 };

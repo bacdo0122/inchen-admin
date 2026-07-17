@@ -9,7 +9,6 @@ pnpm install
 
 cp apps/admin/.env.example apps/admin/.env.local
 #   → API_BASE_URL trỏ tới backend (mặc định http://localhost:4000/api)
-#   → WEB_REVALIDATE_URL / WEB_REVALIDATE_SECRET (khớp với apps/web) nếu đã có web
 
 pnpm --filter @inchem/admin dev     # http://localhost:3001
 ```
@@ -22,10 +21,9 @@ pnpm --filter @inchem/admin dev     # http://localhost:3001
   `middleware.ts` chặn mọi route khi chưa đăng nhập; backend vẫn bắt buộc auth qua JwtAuthGuard.
 - **Đọc dữ liệu**: Server Components gọi API kèm Bearer token, `cache: 'no-store'`
   (`export const dynamic = 'force-dynamic'`) — **admin không dùng ISR**, dữ liệu luôn mới nhất.
-- **Ghi dữ liệu**: Server Actions (`src/actions/*`) gọi backend, rồi:
-  - `revalidatePath(...)` để làm mới chính trang admin;
-  - `revalidateWeb([...tags])` **best-effort** để web public (`apps/web`) cập nhật ISR ngay.
-    Lỗi revalidate KHÔNG làm hỏng thao tác lưu.
+- **Ghi dữ liệu**: Server Actions (`src/actions/*`) gọi backend, rồi `revalidatePath(...)`
+  để làm mới chính trang admin. Web public (`apps/web`) tự làm mới theo ISR thời gian
+  (mặc định 60 giây) — admin không cần chủ động gọi revalidate.
 - **Upload ảnh**: proxy qua `POST /api/upload` (gắn token server-side) → Cloudinary ở backend.
 - **UI**: Tailwind (màu nhấn thương hiệu qua CSS var `--brand` trong `globals.css` — đổi 1 chỗ
   khi có token Figma của web public), form dùng react-hook-form + zod, rich text dùng Tiptap.

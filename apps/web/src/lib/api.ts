@@ -22,21 +22,19 @@ function extractMessage(body: unknown, fallback: string): string {
 }
 
 type GetOptions = {
-  /** Số giây ISR. Mặc định 300s. Đặt 0 để không cache. */
+  /** Số giây ISR. Mặc định 60s. Đặt 0 để không cache. */
   revalidate?: number;
-  /** Tag cache để admin gọi on-demand revalidation. */
-  tags?: string[];
 };
 
 /**
  * GET dữ liệu công khai từ backend (SSG + ISR).
- * Nội dung tin tức/sản phẩm/bảng màu đổi hiếm → cache theo tag, admin revalidate khi sửa.
+ * Cache theo thời gian: nội dung tự làm mới sau `revalidate` giây (mặc định 60s).
  */
 export async function apiGet<T>(path: string, options: GetOptions = {}): Promise<T> {
-  const { revalidate = 300, tags } = options;
+  const { revalidate = 60 } = options;
   const res = await fetch(`${env.apiBaseUrl}${path}`, {
     headers: { 'Content-Type': 'application/json' },
-    next: { revalidate, ...(tags ? { tags } : {}) },
+    next: { revalidate },
   });
 
   const text = await res.text();

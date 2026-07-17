@@ -13,7 +13,6 @@ function required(name: string, value: string | undefined): string {
 
 export const env = {
   apiBaseUrl: required('API_BASE_URL', process.env.API_BASE_URL).replace(/\/$/, ''),
-  revalidateSecret: process.env.WEB_REVALIDATE_SECRET || '',
   siteUrl: (process.env.NEXT_PUBLIC_SITE_URL || 'https://inchemminhhien.com.vn').replace(/\/$/, ''),
   isProd: process.env.NODE_ENV === 'production',
 };

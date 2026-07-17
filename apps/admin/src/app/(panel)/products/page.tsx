@@ -101,7 +101,7 @@ export default async function ProductsPage({
                           <Pencil className="h-4 w-4" />
                         </Button>
                       </Link>
-                      <DeleteProductButton id={p.id} slug={p.slug} name={p.name} compact />
+                      <DeleteProductButton id={p.id} name={p.name} compact />
                     </div>
                   </TD>
                 </TR>

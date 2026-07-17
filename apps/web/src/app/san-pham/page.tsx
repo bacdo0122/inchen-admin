@@ -6,7 +6,7 @@ import { Accent } from '@/components/ui/section-heading';
 import { ProductsExplorer } from '@/components/product/products-explorer';
 import { EmptyNote } from '@/components/ui/empty-note';
 
-export const revalidate = 300;
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: 'Sản phẩm sơn gỗ INCHEM',

@@ -3,7 +3,6 @@
 import { revalidatePath } from 'next/cache';
 import type { ContentStatus } from '@inchem/shared';
 import { apiFetch, mutate } from '@/lib/mutate';
-import { revalidateWeb } from '@/lib/revalidate';
 import type { Post } from '@/lib/types';
 
 export interface PostInput {
@@ -30,7 +29,6 @@ export async function createPostAction(input: PostInput) {
   const res = await mutate(() => apiFetch<Post>('/posts', { method: 'POST', body: clean(input) }));
   if (res.ok) {
     revalidatePath('/posts');
-    await revalidateWeb(['posts', `post:${res.data.slug}`]);
   }
   return res;
 }
@@ -42,16 +40,14 @@ export async function updatePostAction(id: string, input: PostInput) {
   if (res.ok) {
     revalidatePath('/posts');
     revalidatePath(`/posts/${id}`);
-    await revalidateWeb(['posts', `post:${res.data.slug}`]);
   }
   return res;
 }
 
-export async function deletePostAction(id: string, slug: string) {
+export async function deletePostAction(id: string) {
   const res = await mutate(() => apiFetch<{ success: boolean }>(`/posts/${id}`, { method: 'DELETE' }));
   if (res.ok) {
     revalidatePath('/posts');
-    await revalidateWeb(['posts', `post:${slug}`]);
   }
   return res;
 }

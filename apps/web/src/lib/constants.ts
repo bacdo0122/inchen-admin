@@ -17,12 +17,3 @@ export const FOOTER_NAV = [
   { label: 'Tin tức', href: '/tin-tuc' },
   { label: 'Liên hệ', href: '/lien-he' },
 ] as const;
-
-/** Tag cache ISR — thống nhất với admin-dev để revalidate on-demand. */
-export const CACHE_TAGS = {
-  products: 'products',
-  posts: 'posts',
-  colors: 'colors',
-  product: (slug: string) => `product:${slug}`,
-  post: (slug: string) => `post:${slug}`,
-} as const;

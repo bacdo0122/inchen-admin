@@ -94,7 +94,7 @@ export default async function PostsPage({
                           <Pencil className="h-4 w-4" />
                         </Button>
                       </Link>
-                      <DeletePostButton id={post.id} slug={post.slug} title={post.title} compact />
+                      <DeletePostButton id={post.id} title={post.title} compact />
                     </div>
                   </TD>
                 </TR>

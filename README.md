@@ -54,5 +54,5 @@ pnpm api:dev            # http://localhost:4000/api
 - **Lead**: lưu DB trước, gửi email sau (mail lỗi không làm mất lead). Có honeypot + rate limit chống spam.
 - **Email**: cấu hình SMTP qua biến env (`SMTP_*`, `MAIL_TO`).
 - **Ảnh**: upload lên Cloudflare R2 (`R2_*`, API tương thích S3) — xem `apps/api/src/upload`.
-- **Web public** (`apps/web`, cổng 3000): Next.js App Router, dựng theo Figma. SSG + ISR (`revalidate` 5 phút) + on-demand revalidation qua `POST /api/revalidate` (`{ secret, tags }`). SEO: metadata/OG, JSON-LD, `sitemap.xml`, `robots.txt`. Form liên hệ gửi qua server action → `POST /api/leads`.
+- **Web public** (`apps/web`, cổng 3000): Next.js App Router, dựng theo Figma. SSG + ISR theo thời gian (`revalidate` 60 giây). SEO: metadata/OG, JSON-LD, `sitemap.xml`, `robots.txt`. Form liên hệ gửi qua server action → `POST /api/leads`.
 - **Sản phẩm click ở web** → cuộn về khối liên hệ (xử lý phía frontend).

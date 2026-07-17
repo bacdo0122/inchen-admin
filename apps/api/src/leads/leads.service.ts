@@ -33,12 +33,11 @@ export class LeadsService {
       },
     });
 
-    try {
-      await this.mail.sendLeadNotification(lead);
-    } catch (err) {
-      // Không ném lỗi cho client — lead đã an toàn trong DB.
+    // Fire-and-forget: trả response ngay sau khi lưu DB, gửi mail chạy nền.
+    // Không await → client không phải chờ mail; lead đã an toàn trong DB dù mail lỗi.
+    void this.mail.sendLeadNotification(lead).catch((err) => {
       this.logger.error(`Gửi email thông báo lead ${lead.id} thất bại`, err as Error);
-    }
+    });
 
     return { success: true, id: lead.id };
   }

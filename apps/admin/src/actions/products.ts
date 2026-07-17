@@ -3,7 +3,6 @@
 import { revalidatePath } from 'next/cache';
 import type { ContentStatus, ProductGroup } from '@inchem/shared';
 import { apiFetch, mutate } from '@/lib/mutate';
-import { revalidateWeb } from '@/lib/revalidate';
 import type { Product } from '@/lib/types';
 
 export interface ProductInput {
@@ -36,7 +35,6 @@ export async function createProductAction(input: ProductInput) {
   );
   if (res.ok) {
     revalidatePath('/products');
-    await revalidateWeb(['products', `product:${res.data.slug}`]);
   }
   return res;
 }
@@ -48,7 +46,6 @@ export async function updateProductAction(id: string, input: ProductInput) {
   if (res.ok) {
     revalidatePath('/products');
     revalidatePath(`/products/${id}`);
-    await revalidateWeb(['products', `product:${res.data.slug}`]);
   }
   return res;
 }
@@ -60,18 +57,16 @@ export async function toggleProductStatusAction(id: string, status: ContentStatu
   );
   if (res.ok) {
     revalidatePath('/products');
-    await revalidateWeb(['products', `product:${res.data.slug}`]);
   }
   return res;
 }
 
-export async function deleteProductAction(id: string, slug: string) {
+export async function deleteProductAction(id: string) {
   const res = await mutate(() =>
     apiFetch<{ success: boolean }>(`/products/${id}`, { method: 'DELETE' }),
   );
   if (res.ok) {
     revalidatePath('/products');
-    await revalidateWeb(['products', `product:${slug}`]);
   }
   return res;
 }

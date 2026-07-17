@@ -7,13 +7,11 @@ import { deleteProductAction } from '@/actions/products';
 
 export function DeleteProductButton({
   id,
-  slug,
   name,
   redirectTo,
   compact,
 }: {
   id: string;
-  slug: string;
   name: string;
   redirectTo?: string;
   compact?: boolean;
@@ -29,7 +27,7 @@ export function DeleteProductButton({
       confirmLabel="Xoá"
       successMessage="Đã xoá sản phẩm"
       onConfirm={async () => {
-        const res = await deleteProductAction(id, slug);
+        const res = await deleteProductAction(id);
         if (!res.ok) return { error: res.error };
         if (redirectTo) router.push(redirectTo);
       }}

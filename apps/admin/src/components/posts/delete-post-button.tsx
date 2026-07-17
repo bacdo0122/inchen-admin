@@ -7,13 +7,11 @@ import { deletePostAction } from '@/actions/posts';
 
 export function DeletePostButton({
   id,
-  slug,
   title,
   redirectTo,
   compact,
 }: {
   id: string;
-  slug: string;
   title: string;
   redirectTo?: string;
   compact?: boolean;
@@ -29,7 +27,7 @@ export function DeletePostButton({
       confirmLabel="Xoá"
       successMessage="Đã xoá bài viết"
       onConfirm={async () => {
-        const res = await deletePostAction(id, slug);
+        const res = await deletePostAction(id);
         if (!res.ok) return { error: res.error };
         if (redirectTo) router.push(redirectTo);
       }}
