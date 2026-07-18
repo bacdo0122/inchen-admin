@@ -4,9 +4,10 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
 const SLIDES = [
-  { src: '/brand/anh_nen_trang_chu.png', alt: 'Sơn gỗ INCHEM cao cấp' },
-  { src: '/brand/anh_nen_trang_chu_2.png', alt: 'Giải pháp sơn gỗ nội thất INCHEM' },
-  { src: '/brand/anh_nen_trang_chu_3.jpg', alt: 'Hoàn thiện bề mặt gỗ cao cấp INCHEM' },
+  // Thùng sơn nằm ở đáy ảnh → neo cắt về đáy để không mất chân thùng khi khung thấp.
+  { src: '/brand/anh_nen_trang_chu.png', alt: 'Sơn gỗ INCHEM cao cấp', pos: 'right bottom' },
+  { src: '/brand/anh_nen_trang_chu_2.png', alt: 'Giải pháp sơn gỗ nội thất INCHEM', pos: 'center' },
+  { src: '/brand/anh_nen_trang_chu_3.jpg', alt: 'Hoàn thiện bề mặt gỗ cao cấp INCHEM', pos: 'center' },
 ];
 
 const INTERVAL = 5000;
@@ -41,6 +42,7 @@ export function HeroSlider() {
               priority={i === 0}
               sizes="100vw"
               className="object-cover"
+              style={{ objectPosition: slide.pos }}
             />
           </div>
         ))}
