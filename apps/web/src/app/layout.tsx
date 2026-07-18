@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     template: '%s | Sơn INCHEM Minh Hiền',
   },
   description:
-    'Minh Hiền — nhà phân phối độc quyền sơn gỗ INCHEM (Sherwin-Williams) khu vực miền Bắc. Sơn PU, NC, UV, sơn hệ nước cao cấp cho nội thất gỗ. Tư vấn phối màu, báo giá nhanh.',
+    'Minh Hiền - Sơn PU, NC, UV, sơn hệ nước cao cấp cho nội thất gỗ. Tư vấn phối màu, báo giá nhanh.',
   keywords: [
     'sơn gỗ INCHEM',
     'sơn PU miền Bắc',
@@ -41,13 +41,13 @@ export const metadata: Metadata = {
     url: SITE_URL,
     title: 'Sơn gỗ INCHEM (Sherwin-Williams) — Minh Hiền',
     description:
-      'Nhà phân phối độc quyền sơn gỗ INCHEM khu vực miền Bắc. Sơn PU, NC, UV cao cấp cho nội thất gỗ.',
+      '',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Sơn gỗ INCHEM (Sherwin-Williams) — Minh Hiền',
     description:
-      'Nhà phân phối độc quyền sơn gỗ INCHEM khu vực miền Bắc. Sơn PU, NC, UV cao cấp cho nội thất gỗ.',
+      '',
   },
   robots: { index: true, follow: true },
 };

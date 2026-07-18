@@ -8,7 +8,7 @@ import { ButtonLink } from '@/components/ui/button';
 export const metadata: Metadata = {
   title: 'Giới thiệu',
   description:
-    'Minh Hiền - Inchem: nhà phân phối độc quyền sơn gỗ Sherwin-Williams (INCHEM) khu vực phía Bắc, hơn 25 năm kinh nghiệm sơn gỗ nội thất.',
+    'Minh Hiền - Inchem: hơn 25 năm kinh nghiệm sơn gỗ nội thất.',
   alternates: { canonical: '/gioi-thieu' },
 };
 

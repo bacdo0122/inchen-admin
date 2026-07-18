@@ -86,17 +86,6 @@ export default async function OpengraphImage() {
         <div
           style={{
             display: 'flex',
-            marginTop: 28,
-            fontSize: 36,
-            fontWeight: 500,
-            color: '#cdd8e6',
-          }}
-        >
-          Minh Hiền — Nhà phân phối độc quyền khu vực miền Bắc
-        </div>
-        <div
-          style={{
-            display: 'flex',
             marginTop: 48,
             fontSize: 26,
             fontWeight: 500,

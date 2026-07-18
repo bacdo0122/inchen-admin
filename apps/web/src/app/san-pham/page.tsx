@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import { getProducts } from '@/lib/data';
 import { Container } from '@/components/ui/container';
 import { Breadcrumb } from '@/components/layout/breadcrumb';
@@ -36,7 +37,9 @@ export default async function ProductsPage() {
 
         <div className="mt-8">
           {products.length > 0 ? (
-            <ProductsExplorer products={products} />
+            <Suspense fallback={null}>
+              <ProductsExplorer products={products} />
+            </Suspense>
           ) : (
             <EmptyNote tone="dark">Đang cập nhật sản phẩm. Vui lòng quay lại sau.</EmptyNote>
           )}

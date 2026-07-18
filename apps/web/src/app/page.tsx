@@ -3,13 +3,13 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
 import { COMPANY } from '@inchem/shared';
-import { getColors, getPosts, getProducts } from '@/lib/data';
+import { getColors, getPosts } from '@/lib/data';
 import { SITE_URL } from '@/lib/env';
 import { Container } from '@/components/ui/container';
 import { Accent, SectionHeading } from '@/components/ui/section-heading';
 import { ButtonLink } from '@/components/ui/button';
 import { Hero } from '@/components/home/hero';
-import { ProductCard } from '@/components/product/product-card';
+import { ProductCategories } from '@/components/home/product-categories';
 import { ColorCard } from '@/components/color/color-card';
 import { NewsCard } from '@/components/news/news-card';
 import { LeadForm } from '@/components/contact/lead-form';
@@ -32,8 +32,7 @@ async function safe<T>(p: Promise<T>, fallback: T): Promise<T> {
 }
 
 export default async function HomePage() {
-  const [products, colors, posts] = await Promise.all([
-    safe(getProducts(), []),
+  const [colors, posts] = await Promise.all([
     safe(getColors(), []),
     safe(getPosts(1, 3), { items: [], total: 0, page: 1, pageSize: 3, totalPages: 1 }),
   ]);
@@ -42,33 +41,29 @@ export default async function HomePage() {
     <>
       <Hero />
 
-      {/* Sản phẩm nổi bật */}
-      {products.length > 0 && (
-        <section className="bg-navy py-16 lg:py-20">
-          <Container>
-            <SectionHeading
-              badge="Sản phẩm"
-              tone="dark"
-              title={
-                <>
-                  Sơn <Accent>Pu InChem</Accent> Cao Cấp
-                </>
-              }
-              subtitle="Hệ sơn trang trí nội thất gỗ — bền màu, an toàn, đạt chuẩn Sherwin-Williams."
-            />
-            <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {products.slice(0, 6).map((p) => (
-                <ProductCard key={p.id} product={p} />
-              ))}
-            </div>
-            <div className="mt-10 text-center">
-              <ButtonLink href="/san-pham" variant="brand" size="md" withChevron>
-                Xem thêm sản phẩm
-              </ButtonLink>
-            </div>
-          </Container>
-        </section>
-      )}
+      {/* Các loại sơn */}
+      <section className="bg-navy py-16 lg:py-20">
+        <Container>
+          <SectionHeading
+            badge="Sản phẩm"
+            tone="dark"
+            title={
+              <>
+                Các Loại <Accent>Sơn</Accent> INCHEM
+              </>
+            }
+            subtitle="Hệ sơn trang trí nội thất gỗ — bền màu, an toàn, đạt chuẩn Sherwin-Williams."
+          />
+          <div className="mt-10">
+            <ProductCategories />
+          </div>
+          <div className="mt-10 text-center">
+            <ButtonLink href="/san-pham" variant="brand" size="md" withChevron>
+              Xem thêm sản phẩm
+            </ButtonLink>
+          </div>
+        </Container>
+      </section>
 
       <section className="py-16 lg:py-20">
         <Container className="grid items-center gap-10 lg:grid-cols-2">
@@ -121,7 +116,7 @@ export default async function HomePage() {
               }
               subtitle="Khám phá đa dạng tông màu phù hợp mọi phong cách nội thất gỗ hiện đại."
             />
-            <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+            <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
               {colors.slice(0, 12).map((c) => (
                 <ColorCard key={c.id} color={c} />
               ))}

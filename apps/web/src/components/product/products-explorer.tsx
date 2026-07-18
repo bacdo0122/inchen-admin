@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { PRODUCT_GROUP_LABEL, type ProductGroup } from '@inchem/shared';
 import { cn } from '@/lib/utils';
 import { ProductCard } from './product-card';
@@ -26,9 +27,17 @@ const SUB_LABEL: Partial<Record<ProductGroup, string>> = {
   PU_OUTDOOR: 'Sơn PU Inchem ngoài trời',
 };
 
+const PARENT_KEYS: ParentKey[] = ['PU', 'NC', 'UV', 'OTHER'];
+const isParentKey = (v: string | null): v is ParentKey =>
+  v !== null && (PARENT_KEYS as string[]).includes(v);
+
 /** Lưới sản phẩm nhóm 2 cấp + bộ lọc chip (client). Cards vẫn nằm trong HTML để SEO. */
 export function ProductsExplorer({ products }: { products: Product[] }) {
-  const [active, setActive] = useState<ParentKey | 'ALL'>('ALL');
+  // Nhóm active ban đầu lấy từ query ?group= (điều hướng từ trang chủ).
+  const groupParam = useSearchParams().get('group');
+  const [active, setActive] = useState<ParentKey | 'ALL'>(
+    isParentKey(groupParam) ? groupParam : 'ALL',
+  );
 
   // Dựng cây: parent → subs → items, bỏ những nhánh rỗng.
   const parents = useMemo(() => {
