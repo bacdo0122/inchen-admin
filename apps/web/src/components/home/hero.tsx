@@ -1,20 +1,13 @@
-import Image from 'next/image';
 import { ButtonLink } from '@/components/ui/button';
 import { Container } from '@/components/ui/container';
+import { HeroSlider } from './hero-slider';
 
-/** Hero trang chủ — ảnh nền phòng khách + thùng sơn INCHEM, tiêu đề nhấn vàng, 2 CTA. */
+/** Hero trang chủ — slideshow ảnh nền trượt phải→trái, tiêu đề nhấn vàng, 2 CTA. */
 export function Hero() {
   return (
     <section className="relative overflow-hidden bg-navy text-white">
-      {/* Ảnh nền trang chủ */}
-      <Image
-        src="/brand/anh_nen_trang_chu.png"
-        alt="Sơn gỗ INCHEM cao cấp"
-        fill
-        priority
-        sizes="100vw"
-        className="object-cover object-right"
-      />
+      {/* Slideshow ảnh nền trang chủ */}
+      <HeroSlider />
       {/* Lớp phủ tối để chữ dễ đọc, đậm bên trái nhạt dần sang phải */}
       <div
         className="pointer-events-none absolute inset-0"
@@ -24,7 +17,7 @@ export function Hero() {
         }}
         aria-hidden
       />
-      <Container className="relative flex min-h-[520px] items-center py-16 lg:min-h-[600px] lg:py-24">
+      <Container className="relative flex min-h-[520px] items-center py-16 md:min-h-[600px] lg:min-h-[680px] lg:py-24">
         <div className="max-w-xl animate-fade-up">
           <span className="inline-flex items-center rounded-full border border-brand/40 bg-brand/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-brand">
             Sherwin-Williams • INCHEM

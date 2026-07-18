@@ -22,9 +22,6 @@ export function SiteFooter() {
             />
             <span className="leading-tight">
               <span className="block text-[17px] font-bold text-indigo">MINH HIỀN - INCHEM</span>
-              <span className="block text-[10px] font-semibold uppercase tracking-wide text-fg">
-                Nhà phân phối độc quyền thị trường miền Bắc
-              </span>
             </span>
           </div>
 

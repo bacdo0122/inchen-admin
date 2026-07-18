@@ -57,9 +57,6 @@ export function SiteHeader() {
               <span className="block text-base font-bold text-indigo sm:text-[17px]">
                 MINH HIỀN - INCHEM
               </span>
-              <span className="hidden text-[10px] font-medium uppercase tracking-wide text-muted-fg sm:block">
-                Nhà phân phối độc quyền thị trường miền Bắc
-              </span>
             </span>
           </Link>
 

@@ -29,7 +29,7 @@ export function ColorsExplorer({ colors }: { colors: Color[] }) {
       </div>
 
       {visible.length > 0 ? (
-        <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+        <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
           {visible.map((c) => (
             <ColorCard key={c.id} color={c} />
           ))}

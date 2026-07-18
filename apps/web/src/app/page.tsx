@@ -70,7 +70,6 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* Về Minh Hiền */}
       <section className="py-16 lg:py-20">
         <Container className="grid items-center gap-10 lg:grid-cols-2">
           <div className="relative aspect-[3/4] overflow-hidden rounded-2xl bg-muted shadow-card">
@@ -85,7 +84,7 @@ export default async function HomePage() {
           <div>
             <SectionHeading
               align="left"
-              badge="Về Minh Hiền"
+              badge="Công Ty TNHH DV TM & SX Minh Hiền"
               title="Nhà phân phối sơn Sherwin-Williams “Inchem” khu vực phía Bắc"
             />
             <div className="mt-4 space-y-3 text-sm leading-relaxed text-muted-fg sm:text-[15px]">

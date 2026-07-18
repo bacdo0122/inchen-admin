@@ -86,9 +86,8 @@ export default function AboutPage() {
           </p>
         </div>
 
-        {/* Về Minh Hiền */}
         <div className="mt-14">
-          <BadgePill>Về Minh Hiền</BadgePill>
+          <BadgePill>Công Ty TNHH DV TM & SX Minh Hiền</BadgePill>
           <h2 className="mt-4 text-xl font-bold text-navy sm:text-2xl">
             Công Ty TNHH DV TM &amp; SX Minh Hiền — Nhà Phân Phối Sơn Sherwin-Williams “Inchem” Tại
             Khu Vực Phía Bắc Việt Nam

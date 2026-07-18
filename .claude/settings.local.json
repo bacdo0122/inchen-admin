@@ -59,7 +59,16 @@
       "Bash(git -C /home/bacdo/inchem-minhhien/apps/admin config credential.helper)",
       "Bash(git -C /home/bacdo/inchem-minhhien/apps/admin remote get-url origin)",
       "Bash(git commit -q -m 'chore: monorepo \\(web + admin + api\\) for Vercel deploy *)",
-      "Bash(git remote *)"
+      "Bash(git remote *)",
+      "Bash(pip install *)",
+      "Bash(node -e \"try{require\\('sharp'\\);console.log\\('sharp OK'\\)}catch\\(e\\){console.log\\('no sharp'\\)}\")",
+      "Bash(node -e \"try{require\\('canvas'\\);console.log\\('canvas OK'\\)}catch\\(e\\){console.log\\('no canvas'\\)}\")",
+      "Bash(timeout 60 npm i -g sharp-cli)",
+      "Bash(node -e ' *)",
+      "Bash(fc-list)",
+      "Bash(node *)",
+      "Bash(cp __TRACKED_VAR__/logo-mh-preview.png apps/web/public/brand/logo-mh.png)",
+      "Bash(mv apps/web/public/brand/logo-mh.orig.png __TRACKED_VAR__/logo-mh.orig-backup.png)"
     ]
   }
 }
