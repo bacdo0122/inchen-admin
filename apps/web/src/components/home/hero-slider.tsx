@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 
 const SLIDES = [
   // Thùng sơn nằm ở đáy ảnh → neo cắt về đáy để không mất chân thùng khi khung thấp.
-  { src: '/brand/anh_nen_trang_chu.png', alt: 'Sơn gỗ INCHEM cao cấp', pos: 'right bottom' },
+  { src: '/brand/anh_nen_trang_chu.png', alt: 'Sơn gỗ INCHEM cao cấp', pos: 'right 70%' },
   { src: '/brand/anh_nen_trang_chu_2.png', alt: 'Giải pháp sơn gỗ nội thất INCHEM', pos: 'center' },
   { src: '/brand/anh_nen_trang_chu_3.jpg', alt: 'Hoàn thiện bề mặt gỗ cao cấp INCHEM', pos: 'center' },
 ];

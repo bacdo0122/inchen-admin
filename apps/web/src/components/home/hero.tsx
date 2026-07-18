@@ -17,7 +17,7 @@ export function Hero() {
         }}
         aria-hidden
       />
-      <Container className="relative flex min-h-[520px] items-center py-16 md:min-h-[600px] lg:min-h-[680px] lg:py-24">
+      <Container className="relative flex min-h-[520px] items-center py-16 md:min-h-[600px] lg:min-h-[680px] xl:min-h-[720px] lg:py-24">
         <div className="max-w-xl animate-fade-up">
           <span className="inline-flex items-center rounded-full border border-brand/40 bg-brand/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-brand">
             Sherwin-Williams • INCHEM
