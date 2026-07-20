@@ -76,11 +76,11 @@ async function main() {
   console.log(`✓ Products: ${PRODUCTS.length}`);
 
   // Vài màu mẫu (bảng màu thực upload qua admin)
-  const sampleColors: Array<{ code: string; name: string; tone: ColorTone; hex: string }> = [
-    { code: 'SW 6814', name: 'Breathtaking', tone: 'COOL', hex: '#3E6E8E' },
-    { code: 'SW 6634', name: 'Copper Harbor', tone: 'WARM', hex: '#C8794F' },
-    { code: 'SW 7005', name: 'Pure White', tone: 'LIGHT', hex: '#EDECE6' },
-    { code: 'SW 7069', name: 'Iron Ore', tone: 'DARK', hex: '#434341' },
+  const sampleColors: Array<{ code: string; tone: ColorTone; hex: string }> = [
+    { code: 'SW 6814', tone: 'COOL', hex: '#3E6E8E' },
+    { code: 'SW 6634', tone: 'WARM', hex: '#C8794F' },
+    { code: 'SW 7005', tone: 'LIGHT', hex: '#EDECE6' },
+    { code: 'SW 7069', tone: 'DARK', hex: '#434341' },
   ];
   let corder = 0;
   for (const c of sampleColors) {

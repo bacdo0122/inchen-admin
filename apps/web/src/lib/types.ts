@@ -32,7 +32,6 @@ export interface Post {
 export interface Color {
   id: string;
   code: string;
-  name: string;
   tone: ColorTone;
   image: string | null;
   hex: string | null;

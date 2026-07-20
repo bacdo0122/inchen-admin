@@ -57,23 +57,22 @@ export default async function ColorsPage({
           {colors.map((color) => (
             <Card key={color.id} className="overflow-hidden">
               <div className="relative aspect-video bg-muted" style={color.hex && !color.image ? { backgroundColor: color.hex } : undefined}>
-                {color.image && <Image src={color.image} alt={color.name} fill className="object-cover" sizes="200px" unoptimized />}
+                {color.image && <Image src={color.image} alt={color.code} fill className="object-cover" sizes="200px" unoptimized />}
               </div>
               <div className="space-y-1.5 p-3">
                 <div className="flex items-center justify-between gap-2">
-                  <p className="truncate text-sm font-semibold text-fg" title={color.name}>
-                    {color.name}
+                  <p className="truncate font-mono text-sm font-semibold text-fg" title={color.code}>
+                    {color.code}
                   </p>
                   <Badge tone="neutral">{COLOR_TONE_LABEL[color.tone]}</Badge>
                 </div>
-                <p className="font-mono text-xs text-muted-fg">{color.code}</p>
                 <div className="flex items-center justify-end gap-1 pt-1">
                   <ColorFormModal
                     color={color}
                     trigger={<Pencil className="h-4 w-4" />}
                     triggerProps={{ variant: 'ghost', size: 'icon', 'aria-label': 'Sửa' }}
                   />
-                  <DeleteColorButton id={color.id} name={color.name} />
+                  <DeleteColorButton id={color.id} code={color.code} />
                 </div>
               </div>
             </Card>

@@ -34,7 +34,7 @@ async function safe<T>(p: Promise<T>, fallback: T): Promise<T> {
 export default async function HomePage() {
   const [colors, posts] = await Promise.all([
     safe(getColors(), []),
-    safe(getPosts(1, 3), { items: [], total: 0, page: 1, pageSize: 3, totalPages: 1 }),
+    safe(getPosts(1, 8), { items: [], total: 0, page: 1, pageSize: 8, totalPages: 1 }),
   ]);
 
   return (
@@ -117,7 +117,7 @@ export default async function HomePage() {
               subtitle="Khám phá đa dạng tông màu phù hợp mọi phong cách nội thất gỗ hiện đại."
             />
             <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-              {colors.slice(0, 12).map((c) => (
+              {colors.slice(0, 8).map((c) => (
                 <ColorCard key={c.id} color={c} />
               ))}
             </div>

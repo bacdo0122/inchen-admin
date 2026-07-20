@@ -7,7 +7,6 @@ import type { Color } from '@/lib/types';
 
 export interface ColorInput {
   code: string;
-  name: string;
   tone: ColorTone;
   image?: string;
   hex?: string;
@@ -17,7 +16,6 @@ export interface ColorInput {
 function clean(input: ColorInput) {
   return {
     code: input.code.trim(),
-    name: input.name.trim(),
     tone: input.tone,
     image: input.image?.trim() || undefined,
     hex: input.hex?.trim() || undefined,

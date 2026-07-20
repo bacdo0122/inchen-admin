@@ -3,7 +3,7 @@ import Image from 'next/image';
 import { getColors } from '@/lib/data';
 import { Container } from '@/components/ui/container';
 import { PageBanner } from '@/components/layout/page-banner';
-import { ColorsExplorer } from '@/components/color/colors-explorer';
+import { ColorCard } from '@/components/color/color-card';
 import { EmptyNote } from '@/components/ui/empty-note';
 
 export const revalidate = 30;
@@ -46,7 +46,11 @@ export default async function ColorsPage() {
       <section className="py-14 lg:py-20">
         <Container>
           {colors.length > 0 ? (
-            <ColorsExplorer colors={colors} />
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+              {colors.map((c) => (
+                <ColorCard key={c.id} color={c} />
+              ))}
+            </div>
           ) : (
             <EmptyNote>Đang cập nhật bảng màu. Vui lòng quay lại sau.</EmptyNote>
           )}

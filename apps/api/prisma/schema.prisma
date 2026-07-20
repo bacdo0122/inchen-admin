@@ -85,7 +85,6 @@ model Post {
 model Color {
   id        String    @id @default(cuid())
   code      String // vd "SW 6814"
-  name      String // vd "Breathtaking"
   tone      ColorTone
   image     String?
   hex       String? // mã màu hiển thị nếu không có ảnh

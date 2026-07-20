@@ -18,12 +18,6 @@ export class CreateColorDto {
   @MaxLength(50)
   code!: string;
 
-  @ApiProperty({ description: 'Tên màu, vd "Breathtaking"' })
-  @IsString()
-  @MinLength(1)
-  @MaxLength(120)
-  name!: string;
-
   @ApiProperty({ enum: ColorTone })
   @IsEnum(ColorTone)
   tone!: ColorTone;

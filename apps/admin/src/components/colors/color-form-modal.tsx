@@ -16,7 +16,6 @@ import type { Color } from '@/lib/types';
 
 const schema = z.object({
   code: z.string().min(1, 'Nhập mã màu').max(50),
-  name: z.string().min(1, 'Nhập tên màu').max(120),
   tone: z.nativeEnum(COLOR_TONE),
   hex: z
     .string()
@@ -51,7 +50,6 @@ export function ColorFormModal({
     resolver: zodResolver(schema),
     defaultValues: {
       code: color?.code ?? '',
-      name: color?.name ?? '',
       tone: color?.tone ?? COLOR_TONE.WARM,
       hex: color?.hex ?? '',
       image: color?.image ?? '',
@@ -62,7 +60,6 @@ export function ColorFormModal({
   const onSubmit = handleSubmit(async (values) => {
     const input: ColorInput = {
       code: values.code,
-      name: values.name,
       tone: values.tone,
       hex: values.hex || undefined,
       image: values.image || undefined,
@@ -89,14 +86,9 @@ export function ColorFormModal({
         title={isEdit ? 'Sửa màu' : 'Thêm màu'}
       >
         <form onSubmit={onSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <Field label="Mã màu" htmlFor="code" required error={errors.code?.message}>
-              <Input id="code" {...register('code')} placeholder="SW 6814" />
-            </Field>
-            <Field label="Tên màu" htmlFor="name" required error={errors.name?.message}>
-              <Input id="name" {...register('name')} placeholder="Breathtaking" />
-            </Field>
-          </div>
+          <Field label="Mã màu" htmlFor="code" required error={errors.code?.message}>
+            <Input id="code" {...register('code')} placeholder="SW 6814" />
+          </Field>
 
           <div className="grid grid-cols-2 gap-4">
             <Field label="Tông màu" htmlFor="tone" required error={errors.tone?.message}>
