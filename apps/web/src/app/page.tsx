@@ -84,18 +84,40 @@ export default async function HomePage() {
             />
             <div className="mt-4 space-y-3 text-sm leading-relaxed text-muted-fg sm:text-[15px]">
               <p>
-                Công ty TNHH DV TM &amp; SX Minh Hiền có hơn 25 năm kinh nghiệm trong lĩnh vực sơn gỗ
-                nội thất. Chúng tôi nghiên cứu và phát triển hàng chục nghìn mẫu sơn trên nhiều chất
-                liệu gỗ, thực hiện bởi đội ngũ kỹ thuật viên giàu kinh nghiệm.
+                Với bề dầy hơn 25 năm kinh nghiệm trong lĩnh vực phân phối sơn
+                gỗ nội thất . Cùng với đội ngũ kỹ thuật viên giàu kinh nghiệm ,
+                nhiệt huyết , năng động yêu nghề Công ty TNHH DVTM và SX Minh
+                Hiền đã mang đến cho khách hàng hàng chục nghìn mẫu sản phẩm đa
+                dạng về chủng loại và màu sắc nổi trội tại thị trường Việt Nam
+                và nhiều nước khác trên thế giới.
               </p>
               <p>
-                Với cam kết cung cấp sản phẩm chính hãng, giải pháp hoàn thiện bề mặt tối ưu và dịch
-                vụ kỹ thuật chuyên nghiệp, Minh Hiền góp phần nâng cao chất lượng và giá trị cho từng
-                sản phẩm nội thất của khách hàng.
+                Công ty TNHH DVTM và SX Minh Hiền luôn nỗ lực không ngừng cho
+                mục tiêu ứng dụng công nghệ và kinh nghiệm cạnh tranh trên thị
+                trường quốc tế, phát triển nhu cầu nội địa. Thông qua tối ưu hóa
+                dây chuyền sản xuất thông minh nhằm tạo ra những sản phẩm vượt
+                trội về chất lượng, mang đến giải pháp toàn diện – hiện đại về
+                sản phẩm.
+              </p>
+              <p>
+                Công ty TNHH DVTM và SX Minh Hiền luôn tự hào là doanh nghiệp
+                cung cấp sản phẩm sơn gỗ INCHEM cao cấp cho rất nhiều dự án lớn
+                và khách hàng lớn như Landco, Việt’power, Woodsland và rất nhiều
+                những khách hàng khác.
+              </p>
+              <p>
+                Chúng tôi luôn xem khách hàng là trung tâm của mọi hoạt động.
+                Công ty TNHH DVTM và SX Minh Hiền cam kết khẳng định vị thế đối
+                tác chiến lược trong lĩnh vực sơn gỗ nội thất.
               </p>
             </div>
             <div className="mt-6">
-              <ButtonLink href="/gioi-thieu" variant="ghost" size="md" withChevron>
+              <ButtonLink
+                href="/gioi-thieu"
+                variant="ghost"
+                size="md"
+                withChevron
+              >
                 Tìm hiểu thêm
               </ButtonLink>
             </div>
@@ -135,8 +157,15 @@ export default async function HomePage() {
         <section className="py-16 lg:py-20">
           <Container>
             <div className="flex flex-wrap items-end justify-between gap-4">
-              <SectionHeading align="left" badge="Tin tức & sự kiện" title="Tin tức mới nhất" />
-              <Link href="/tin-tuc" className="inline-flex items-center gap-1 text-sm font-semibold text-indigo">
+              <SectionHeading
+                align="left"
+                badge="Tin tức & sự kiện"
+                title="Tin tức mới nhất"
+              />
+              <Link
+                href="/tin-tuc"
+                className="inline-flex items-center gap-1 text-sm font-semibold text-indigo"
+              >
                 Tất cả tin tức
                 <ArrowRight className="size-4" aria-hidden />
               </Link>
@@ -153,7 +182,10 @@ export default async function HomePage() {
       {/* Liên hệ */}
       <section id="lien-he" className="bg-section py-16 lg:py-20">
         <Container>
-          <SectionHeading title="Liên Hệ Với Chúng Tôi" subtitle={COMPANY.name} />
+          <SectionHeading
+            title="Liên Hệ Với Chúng Tôi"
+            subtitle={COMPANY.name}
+          />
           <div className="mt-10 grid gap-10 lg:grid-cols-2">
             <LeadForm />
             <ContactInfo />

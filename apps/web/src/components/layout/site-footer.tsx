@@ -26,7 +26,7 @@ export function SiteFooter() {
           </div>
 
           <p className="mt-5 text-sm text-fg">
-            Giá tốt • Hàng chính hãng • Hỗ trợ phối màu và tư vấn kỹ thuật • Giao hàng nhanh
+            Hàng chính hãng • Hỗ trợ phối màu và tư vấn kỹ thuật • Giao hàng nhanh
           </p>
 
           <ul className="mt-5 space-y-2 text-sm text-muted-fg">
