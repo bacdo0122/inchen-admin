@@ -68,7 +68,9 @@
       "Bash(fc-list)",
       "Bash(node *)",
       "Bash(cp __TRACKED_VAR__/logo-mh-preview.png apps/web/public/brand/logo-mh.png)",
-      "Bash(mv apps/web/public/brand/logo-mh.orig.png __TRACKED_VAR__/logo-mh.orig-backup.png)"
+      "Bash(mv apps/web/public/brand/logo-mh.orig.png __TRACKED_VAR__/logo-mh.orig-backup.png)",
+      "Bash(pnpm --filter @inchem/admin typecheck)",
+      "Bash(pnpm --filter @inchem/web lint)"
     ]
   }
 }

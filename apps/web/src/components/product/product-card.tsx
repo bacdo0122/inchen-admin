@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { PaintBucket } from 'lucide-react';
 import { ButtonLink } from '@/components/ui/button';
@@ -15,16 +16,21 @@ export function ProductCard({ product }: { product: Product }) {
 
   return (
     <article className="group flex transform-gpu flex-col overflow-hidden rounded-2xl bg-white shadow-card transition hover:-translate-y-1 hover:shadow-card-hover">
-      <Link href="/lien-he" className="block bg-black" aria-label={`Liên hệ về ${product.name}`}>
+      <Link
+        href="/lien-he"
+        className="relative block aspect-[4/3] overflow-hidden rounded-t-2xl bg-black"
+        aria-label={`Liên hệ về ${product.name}`}
+      >
         {product.image ? (
-          <img
+          <Image
             src={product.image}
             alt={product.name}
-            loading="lazy"
-            className="block h-auto w-full rounded-t-2xl transition-transform duration-300"
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            className="object-cover transition-transform duration-300 group-hover:scale-105"
           />
         ) : (
-          <span className="flex aspect-[4/3] items-center justify-center text-navy/30">
+          <span className="absolute inset-0 flex items-center justify-center text-navy/30">
             <PaintBucket className="size-16" aria-hidden />
           </span>
         )}

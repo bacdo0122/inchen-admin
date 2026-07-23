@@ -11,18 +11,12 @@ export function NewsCard({ post }: { post: Post }) {
     <article className="group flex flex-col overflow-hidden rounded-2xl bg-white shadow-card transition hover:-translate-y-1 hover:shadow-card-hover">
       <Link href={href} className="relative block aspect-[16/9] bg-muted">
         {post.thumbnail ? (
-          // <Image
-          //   src={post.thumbnail}
-          //   alt={post.title}
-          //   fill
-          //   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-          //   className="object-cover transition-transform duration-300 group-hover:scale-105"
-          // />
-          <img
+          <Image
             src={post.thumbnail}
             alt={post.title}
-            loading="lazy"
-            className="block h-auto w-full rounded-t-2xl transition-transform duration-300"
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            className="object-cover transition-transform duration-300 group-hover:scale-105"
           />
         ) : (
           <span className="absolute inset-0 flex items-center justify-center text-navy/25">

@@ -150,7 +150,7 @@ export function ProductForm({ product }: { product?: Product }) {
                 control={control}
                 name="image"
                 render={({ field }) => (
-                  <ImageUpload value={field.value || undefined} onChange={(url) => field.onChange(url ?? '')} aspect="aspect-square" />
+                  <ImageUpload value={field.value || undefined} onChange={(url) => field.onChange(url ?? '')} aspect="aspect-[4/3]" aspectRatio={4 / 3} />
                 )}
               />
             </CardBody>

@@ -142,7 +142,7 @@ export function PostForm({ post }: { post?: Post }) {
                 control={control}
                 name="thumbnail"
                 render={({ field }) => (
-                  <ImageUpload value={field.value || undefined} onChange={(url) => field.onChange(url ?? '')} label="Ảnh bìa" />
+                  <ImageUpload value={field.value || undefined} onChange={(url) => field.onChange(url ?? '')} label="Ảnh bìa" aspect="aspect-video" aspectRatio={16 / 9} />
                 )}
               />
             </CardBody>

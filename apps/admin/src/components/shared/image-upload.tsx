@@ -6,24 +6,47 @@ import { ImagePlus, Loader2, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import type { UploadResult } from '@/lib/types';
+import { ImageCropperModal } from './image-cropper';
 
 /**
- * Upload 1 ảnh qua proxy /api/upload → trả URL Cloudinary.
+ * Upload 1 ảnh qua proxy /api/upload → trả URL trên Cloudflare R2.
  * Có preview, báo tiến trình (đang tải), và nút gỡ ảnh.
+ *
+ * Nếu truyền `aspectRatio` (rộng/cao), ảnh vừa chọn sẽ đi qua bước cắt (crop)
+ * theo đúng tỉ lệ trước khi upload → mọi ảnh lưu lên R2 đều đúng khung, hiển thị
+ * đẹp đồng nhất trên cả desktop lẫn mobile.
  */
 export function ImageUpload({
   value,
   onChange,
   label = 'Ảnh',
   aspect = 'aspect-video',
+  aspectRatio,
 }: {
   value?: string;
   onChange: (url: string | undefined) => void;
   label?: string;
   aspect?: string;
+  /** Bật crop theo tỉ lệ cố định = rộng / cao (vd 4/3, 16/9, 3/4). Bỏ trống = upload thẳng. */
+  aspectRatio?: number;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+  const [cropSrc, setCropSrc] = useState<string | null>(null);
+
+  /** Đọc file cục bộ thành data URL để nạp vào trình cắt (không dính CORS). */
+  const openCropper = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = () => setCropSrc(String(reader.result));
+    reader.onerror = () => toast.error('Không đọc được tệp ảnh');
+    reader.readAsDataURL(file);
+  };
+
+  /** Chọn/đổi ảnh: có tỉ lệ thì mở cropper, không thì upload thẳng. */
+  const handlePick = (file: File) => {
+    if (aspectRatio) openCropper(file);
+    else void handleFile(file);
+  };
 
   const handleFile = async (file: File) => {
     setUploading(true);
@@ -54,9 +77,23 @@ export function ImageUpload({
         className="hidden"
         onChange={(e) => {
           const file = e.target.files?.[0];
-          if (file) void handleFile(file);
+          if (file) handlePick(file);
+          // Reset ngay để chọn lại cùng 1 tệp vẫn kích hoạt onChange.
+          if (inputRef.current) inputRef.current.value = '';
         }}
       />
+
+      {cropSrc && aspectRatio && (
+        <ImageCropperModal
+          src={cropSrc}
+          aspect={aspectRatio}
+          onCancel={() => setCropSrc(null)}
+          onCropped={(file) => {
+            setCropSrc(null);
+            void handleFile(file);
+          }}
+        />
+      )}
 
       {value ? (
         <div className={cn('relative overflow-hidden rounded-lg border bg-muted', aspect)}>

@@ -126,13 +126,15 @@ export function ColorFormModal({
 
           <div>
             <p className="mb-1.5 text-sm font-medium text-fg">Ảnh mẫu màu</p>
-            <Controller
-              control={control}
-              name="image"
-              render={({ field }) => (
-                <ImageUpload value={field.value || undefined} onChange={(url) => field.onChange(url ?? '')} aspect="aspect-video" />
-              )}
-            />
+            <div className="max-w-[160px]">
+              <Controller
+                control={control}
+                name="image"
+                render={({ field }) => (
+                  <ImageUpload value={field.value || undefined} onChange={(url) => field.onChange(url ?? '')} aspect="aspect-[3/4]" aspectRatio={3 / 4} />
+                )}
+              />
+            </div>
           </div>
 
           <div className="flex justify-end gap-2 pt-2">
