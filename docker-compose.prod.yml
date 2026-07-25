@@ -61,6 +61,61 @@ services:
       options: { max-size: '10m', max-file: '3' }
     networks: [inchem]
 
+  # ── Web public (Next.js) ──────────────────────────────────
+  web:
+    image: ghcr.io/bacdo0122/inchen-admin/web:${WEB_TAG:-latest}
+    container_name: inchem-web
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      TZ: Asia/Ho_Chi_Minh
+      # Gọi API qua network nội bộ của Docker: không ra internet, không qua
+      # Nginx/Cloudflare, không tốn TLS handshake. Kèm prefix /api của NestJS.
+      API_BASE_URL: http://api:4000/api
+    ports:
+      - '127.0.0.1:3000:3000'
+    healthcheck:
+      test: ['CMD-SHELL', 'curl -fsS http://127.0.0.1:3000/ >/dev/null || exit 1']
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    logging:
+      driver: json-file
+      options: { max-size: '10m', max-file: '3' }
+    networks: [inchem]
+
+  # ── Admin CMS (Next.js) ───────────────────────────────────
+  admin:
+    image: ghcr.io/bacdo0122/inchen-admin/admin:${ADMIN_TAG:-latest}
+    container_name: inchem-admin
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      TZ: Asia/Ho_Chi_Minh
+      API_BASE_URL: http://api:4000/api
+    ports:
+      - '127.0.0.1:3001:3001'
+    healthcheck:
+      # Trang / của admin redirect sang /login khi chưa đăng nhập → chấp nhận 2xx/3xx.
+      test: ['CMD-SHELL', 'curl -fsS -o /dev/null -w "%{http_code}" http://127.0.0.1:3001/login | grep -q 200']
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    logging:
+      driver: json-file
+      options: { max-size: '10m', max-file: '3' }
+    networks: [inchem]
+
 volumes:
   db_data:
 

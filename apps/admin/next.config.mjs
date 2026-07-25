@@ -1,6 +1,14 @@
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  // Xem ghi chú ở apps/web/next.config.mjs.
+  output: 'standalone',
+  outputFileTracingRoot: path.join(__dirname, '../..'),
   // Cho phép import trực tiếp package workspace dạng source-only (TS chưa build).
   transpilePackages: ['@inchem/shared'],
   images: {

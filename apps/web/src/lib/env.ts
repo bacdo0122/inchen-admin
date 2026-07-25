@@ -13,11 +13,11 @@ function required(name: string, value: string | undefined): string {
 
 export const env = {
   apiBaseUrl: required('API_BASE_URL', process.env.API_BASE_URL).replace(/\/$/, ''),
-  siteUrl: (process.env.NEXT_PUBLIC_SITE_URL || 'https://inchemminhhien.com.vn').replace(/\/$/, ''),
+  siteUrl: (process.env.NEXT_PUBLIC_SITE_URL || 'https://minhhieninchem.com.vn').replace(/\/$/, ''),
   isProd: process.env.NODE_ENV === 'production',
 };
 
 /** URL site dùng được ở cả client (chỉ đọc giá trị public). */
 export const SITE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL || 'https://inchemminhhien.com.vn'
+  process.env.NEXT_PUBLIC_SITE_URL || 'https://minhhieninchem.com.vn'
 ).replace(/\/$/, '');

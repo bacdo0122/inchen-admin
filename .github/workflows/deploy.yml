@@ -1,0 +1,208 @@
+name: Deploy lên EC2 (api + web + admin + db)
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'apps/**'
+      - 'packages/**'
+      - 'docker-compose.prod.yml'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - 'package.json'
+      - '.github/workflows/deploy.yml'
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: 'Tag ảnh có sẵn để rollback cả 3 app (bỏ trống = build từ commit hiện tại)'
+        required: false
+        default: ''
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+env:
+  REGISTRY_PREFIX: ghcr.io/bacdo0122/inchen-admin
+  DEPLOY_DIR: /opt/inchem
+  # URL API công khai — dùng lúc BUILD web (Next prerender các trang ISR nên
+  # phải gọi được API thật từ runner GitHub). Lúc chạy thì compose ghi đè
+  # bằng http://api:4000/api qua network nội bộ.
+  API_BASE_URL: ${{ vars.API_BASE_URL || 'https://api.minhhieninchem.com.vn/api' }}
+  NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL || 'https://minhhieninchem.com.vn' }}
+
+jobs:
+  # ── 1. Build 3 image song song, đẩy lên GHCR ──────────────
+  build:
+    name: Build ${{ matrix.app }}
+    if: github.event.inputs.image_tag == ''
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: true
+      matrix:
+        app: [api, web, admin]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Đăng nhập GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & push ${{ matrix.app }}
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/${{ matrix.app }}/Dockerfile
+          push: true
+          tags: |
+            ${{ env.REGISTRY_PREFIX }}/${{ matrix.app }}:${{ github.sha }}
+            ${{ env.REGISTRY_PREFIX }}/${{ matrix.app }}:latest
+          # Dockerfile của api không dùng 2 arg này — Docker chỉ cảnh báo, không lỗi.
+          build-args: |
+            API_BASE_URL=${{ env.API_BASE_URL }}
+            NEXT_PUBLIC_SITE_URL=${{ env.NEXT_PUBLIC_SITE_URL }}
+          cache-from: type=gha,scope=${{ matrix.app }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.app }}
+          provenance: false
+
+  # ── 2. SSH vào EC2, pull image, up compose ────────────────
+  deploy:
+    name: Deploy lên EC2
+    needs: [build]
+    if: always() && (needs.build.result == 'success' || needs.build.result == 'skipped')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      # Chỉ db + api cần .env. web/admin lấy env từ khối environment: của compose.
+      - name: Dựng file .env từ các secret
+        env:
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          CORS_ORIGINS: ${{ secrets.CORS_ORIGINS }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          MAIL_FROM: ${{ secrets.MAIL_FROM }}
+          MAIL_TO: ${{ secrets.MAIL_TO }}
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_PUBLIC_URL: ${{ secrets.R2_PUBLIC_URL }}
+          JWT_EXPIRES_IN: ${{ secrets.JWT_EXPIRES_IN || '7d' }}
+          R2_FOLDER: ${{ secrets.R2_FOLDER || 'images' }}
+          ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+          ADMIN_NAME: ${{ secrets.ADMIN_NAME }}
+        run: |
+          set -eu
+          REQUIRED="POSTGRES_USER POSTGRES_PASSWORD POSTGRES_DB JWT_SECRET CORS_ORIGINS
+                    RESEND_API_KEY MAIL_FROM MAIL_TO
+                    R2_ACCOUNT_ID R2_BUCKET R2_ACCESS_KEY_ID R2_SECRET_ACCESS_KEY R2_PUBLIC_URL"
+          OPTIONAL="JWT_EXPIRES_IN R2_FOLDER ADMIN_EMAIL ADMIN_PASSWORD ADMIN_NAME"
+
+          missing=""
+          for k in $REQUIRED; do
+            [ -n "$(printenv "$k" || true)" ] || missing="$missing $k"
+          done
+          if [ -n "$missing" ]; then
+            echo "❌ Chưa cấu hình secret:$missing"
+            exit 1
+          fi
+
+          : > env.production
+          for k in $REQUIRED $OPTIONAL; do
+            v=$(printenv "$k" || true)
+            [ -n "$v" ] || continue
+            printf '%s=%s\n' "$k" "$(printf '%s' "$v" | tr -d '\r')" >> env.production
+          done
+
+          echo "▶ Đã dựng env.production với $(wc -l < env.production) biến:"
+          cut -d= -f1 env.production
+
+      - name: Copy compose + env lên EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: ${{ secrets.EC2_SSH_PORT || 22 }}
+          source: docker-compose.prod.yml,env.production
+          target: ${{ env.DEPLOY_DIR }}
+
+      - name: Pull image & khởi động lại toàn bộ service
+        uses: appleboy/ssh-action@v1.2.0
+        env:
+          TAG: ${{ github.event.inputs.image_tag || github.sha }}
+          GHCR_USER: ${{ github.actor }}
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: ${{ secrets.EC2_SSH_PORT || 22 }}
+          envs: TAG,GHCR_USER,GHCR_TOKEN,DEPLOY_DIR
+          script_stop: true
+          command_timeout: 15m
+          script: |
+            set -eu
+            cd "$DEPLOY_DIR"
+
+            if [ ! -f env.production ]; then
+              echo "❌ Không thấy env.production vừa copy lên"
+              exit 1
+            fi
+            mv -f env.production .env
+            chmod 600 .env
+            mkdir -p backups
+
+            echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
+
+            export API_TAG="$TAG" WEB_TAG="$TAG" ADMIN_TAG="$TAG"
+            echo "▶ Deploy tag: $TAG"
+            docker compose -f docker-compose.prod.yml pull
+            # Entrypoint của api tự chạy `prisma migrate deploy` trước khi start.
+            docker compose -f docker-compose.prod.yml up -d --remove-orphans
+
+            echo "▶ Chờ các container healthy..."
+            failed=""
+            for c in inchem-api inchem-web inchem-admin; do
+              status=starting
+              for _ in $(seq 1 40); do
+                status=$(docker inspect -f '{{.State.Health.Status}}' "$c" 2>/dev/null || echo missing)
+                [ "$status" = healthy ] && break
+                [ "$status" = unhealthy ] && break
+                sleep 5
+              done
+              echo "  $c → $status"
+              [ "$status" = healthy ] || failed="$failed $c"
+            done
+
+            if [ -n "$failed" ]; then
+              echo "❌ Không healthy:$failed"
+              for c in $failed; do
+                echo "── log $c ──"
+                docker logs --tail=80 "$c" 2>&1 || true
+              done
+              docker logout ghcr.io || true
+              exit 1
+            fi
+
+            echo "✅ Deploy xong"
+            docker compose -f docker-compose.prod.yml ps
+            docker image prune -f
+            docker logout ghcr.io
