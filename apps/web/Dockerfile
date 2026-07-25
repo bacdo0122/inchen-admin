@@ -44,9 +44,13 @@ ENV NODE_ENV=production \
     PORT=3000 \
     HOSTNAME=0.0.0.0
 # outputFileTracingRoot = gốc repo → cấu trúc standalone giữ nguyên apps/web/...
-COPY --from=builder /app/apps/web/.next/standalone ./
-COPY --from=builder /app/apps/web/.next/static     ./apps/web/.next/static
-COPY --from=builder /app/apps/web/public           ./apps/web/public
+# --chown là BẮT BUỘC: mặc định COPY đặt owner root, mà container chạy bằng user
+# `node`. ISR (revalidate = 30) cần GHI vào .next/cache và .next/server lúc chạy,
+# thiếu quyền sẽ báo EACCES và trang không bao giờ được làm mới.
+COPY --from=builder --chown=node:node /app/apps/web/.next/standalone ./
+COPY --from=builder --chown=node:node /app/apps/web/.next/static     ./apps/web/.next/static
+COPY --from=builder --chown=node:node /app/apps/web/public           ./apps/web/public
+RUN mkdir -p apps/web/.next/cache && chown -R node:node apps/web/.next
 USER node
 EXPOSE 3000
 CMD ["node", "apps/web/server.js"]

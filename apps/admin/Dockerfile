@@ -42,9 +42,12 @@ FROM base AS runner
 ENV NODE_ENV=production \
     PORT=3001 \
     HOSTNAME=0.0.0.0
-COPY --from=builder /app/apps/admin/.next/standalone ./
-COPY --from=builder /app/apps/admin/.next/static     ./apps/admin/.next/static
-COPY --from=builder /app/apps/admin/public           ./apps/admin/public
+# --chown: xem ghi chú ở apps/web/Dockerfile. Admin dùng cache: 'no-store' nên ít
+# ghi hơn, nhưng Next vẫn cần .next/cache cho fetch cache và ảnh tối ưu.
+COPY --from=builder --chown=node:node /app/apps/admin/.next/standalone ./
+COPY --from=builder --chown=node:node /app/apps/admin/.next/static     ./apps/admin/.next/static
+COPY --from=builder --chown=node:node /app/apps/admin/public           ./apps/admin/public
+RUN mkdir -p apps/admin/.next/cache && chown -R node:node apps/admin/.next
 USER node
 EXPOSE 3001
 CMD ["node", "apps/admin/server.js"]
