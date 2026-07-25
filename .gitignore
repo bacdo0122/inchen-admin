@@ -30,3 +30,4 @@ uploads/
 
 # prisma
 apps/api/prisma/*.db
+env.production
