@@ -133,17 +133,24 @@ jobs:
           echo "▶ Đã dựng env.production với $(wc -l < env.production) biến:"
           cut -d= -f1 env.production
 
-      - name: Copy compose + env lên EC2
+      # Đưa script ra gốc repo để scp-action đặt nó thẳng vào DEPLOY_DIR
+      # (action giữ nguyên đường dẫn tương đối của source).
+      - name: Chuẩn bị script deploy
+        run: |
+          cp deploy/remote-deploy.sh remote-deploy.sh
+          bash -n remote-deploy.sh
+
+      - name: Copy compose + env + script lên EC2
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           port: ${{ secrets.EC2_SSH_PORT || 22 }}
-          source: docker-compose.prod.yml,env.production
+          source: docker-compose.prod.yml,env.production,remote-deploy.sh
           target: ${{ env.DEPLOY_DIR }}
 
-      - name: Pull image & khởi động lại toàn bộ service
+      - name: Chạy deploy trên EC2
         uses: appleboy/ssh-action@v1.2.0
         env:
           TAG: ${{ github.event.inputs.image_tag || github.sha }}
@@ -157,81 +164,5 @@ jobs:
           port: ${{ secrets.EC2_SSH_PORT || 22 }}
           envs: TAG,GHCR_USER,GHCR_TOKEN,DEPLOY_DIR
           script_stop: true
-          command_timeout: 15m
-          script: |
-            set -eu
-            cd "$DEPLOY_DIR"
-
-            if [ ! -f env.production ]; then
-              echo "❌ Không thấy env.production vừa copy lên"
-              exit 1
-            fi
-            mv -f env.production .env
-            chmod 600 .env
-            mkdir -p backups
-
-            echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
-
-            export API_TAG="$TAG" WEB_TAG="$TAG" ADMIN_TAG="$TAG"
-            echo "▶ Deploy tag: $TAG"
-
-            # Dọn TRƯỚC khi pull — lúc pull là lúc đĩa căng nhất. Image cũ vẫn
-            # còn tag SHA nên `prune -f` thường không đụng tới, phải dùng -a.
-            # Giữ lại image trong 7 ngày để còn rollback nhanh.
-            echo "▶ Dung lượng trước khi dọn:"
-            df -h / | tail -1
-            docker image prune -af --filter 'until=168h' || true
-            docker builder prune -f --filter 'until=168h' || true
-
-            docker compose -f docker-compose.prod.yml pull
-            # Entrypoint của api tự chạy `prisma migrate deploy` trước khi start.
-            docker compose -f docker-compose.prod.yml up -d --remove-orphans
-
-            echo "▶ Trạng thái ngay sau khi up:"
-            docker compose -f docker-compose.prod.yml ps -a
-
-            echo "▶ Chờ các container healthy..."
-            # Trả về trạng thái gộp: healthy / unhealthy / starting / <trạng thái container>
-            probe() {
-              docker inspect \
-                -f '{{if .State.Health}}{{.State.Health.Status}}{{else}}{{.State.Status}}{{end}}' \
-                "$1" 2>&1 || echo inspect-failed
-            }
-
-            failed=""
-            for c in inchem-api inchem-web inchem-admin; do
-              st=$(probe "$c")
-              i=0
-              # Tối đa 40 vòng × 5s = 200s cho mỗi container.
-              while [ "$i" -lt 40 ]; do
-                case "$st" in
-                  healthy)                 break ;;
-                  unhealthy|exited|dead)   break ;;
-                  inspect-failed|*"No such object"*) break ;;
-                esac
-                i=$((i + 1))
-                sleep 5
-                st=$(probe "$c")
-                # In tiến độ mỗi 30s để log không im lặng suốt 200s.
-                [ $((i % 6)) -eq 0 ] && echo "    ... $c: $st ($((i * 5))s)"
-              done
-              echo "  $c → $st"
-              [ "$st" = healthy ] || failed="$failed $c"
-            done
-
-            if [ -n "$failed" ]; then
-              echo "❌ Không healthy:$failed"
-              for c in $failed; do
-                echo "── log $c ──"
-                docker logs --tail=80 "$c" 2>&1 || true
-              done
-              docker logout ghcr.io || true
-              exit 1
-            fi
-
-            echo "✅ Deploy xong"
-            docker compose -f docker-compose.prod.yml ps
-            docker image prune -f
-            echo "▶ Dung lượng sau khi deploy:"
-            df -h / | tail -1
-            docker logout ghcr.io
+          command_timeout: 20m
+          script: bash "$DEPLOY_DIR/remote-deploy.sh"
