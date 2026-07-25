@@ -32,6 +32,9 @@ ENV API_BASE_URL=$API_BASE_URL \
     NODE_ENV=production
 COPY apps/admin      apps/admin
 COPY packages/shared packages/shared
+# Admin chưa có asset tĩnh nào. Tạo sẵn thư mục để COPY ở stage runner luôn có
+# đích tồn tại, kể cả khi apps/admin/public không nằm trong git.
+RUN mkdir -p apps/admin/public
 RUN pnpm --filter @inchem/admin build
 
 # ── runner ────────────────────────────────────────────────

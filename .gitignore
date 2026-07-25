@@ -9,6 +9,11 @@ out/
 build/
 .turbo/
 
+# khoá SSH / chứng chỉ — TUYỆT ĐỐI không commit
+*.pem
+*.key
+*:Zone.Identifier
+
 # env
 .env
 .env.local
