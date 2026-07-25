@@ -187,18 +187,36 @@ jobs:
             # Entrypoint của api tự chạy `prisma migrate deploy` trước khi start.
             docker compose -f docker-compose.prod.yml up -d --remove-orphans
 
+            echo "▶ Trạng thái ngay sau khi up:"
+            docker compose -f docker-compose.prod.yml ps -a
+
             echo "▶ Chờ các container healthy..."
+            # Trả về trạng thái gộp: healthy / unhealthy / starting / <trạng thái container>
+            probe() {
+              docker inspect \
+                -f '{{if .State.Health}}{{.State.Health.Status}}{{else}}{{.State.Status}}{{end}}' \
+                "$1" 2>&1 || echo inspect-failed
+            }
+
             failed=""
             for c in inchem-api inchem-web inchem-admin; do
-              status=starting
-              for _ in $(seq 1 40); do
-                status=$(docker inspect -f '{{.State.Health.Status}}' "$c" 2>/dev/null || echo missing)
-                [ "$status" = healthy ] && break
-                [ "$status" = unhealthy ] && break
+              st=$(probe "$c")
+              i=0
+              # Tối đa 40 vòng × 5s = 200s cho mỗi container.
+              while [ "$i" -lt 40 ]; do
+                case "$st" in
+                  healthy)                 break ;;
+                  unhealthy|exited|dead)   break ;;
+                  inspect-failed|*"No such object"*) break ;;
+                esac
+                i=$((i + 1))
                 sleep 5
+                st=$(probe "$c")
+                # In tiến độ mỗi 30s để log không im lặng suốt 200s.
+                [ $((i % 6)) -eq 0 ] && echo "    ... $c: $st ($((i * 5))s)"
               done
-              echo "  $c → $status"
-              [ "$status" = healthy ] || failed="$failed $c"
+              echo "  $c → $st"
+              [ "$st" = healthy ] || failed="$failed $c"
             done
 
             if [ -n "$failed" ]; then
