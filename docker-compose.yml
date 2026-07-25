@@ -1,0 +1,71 @@
+name: inchem
+
+services:
+  # ── PostgreSQL ────────────────────────────────────────────
+  db:
+    image: postgres:16-alpine
+    container_name: inchem-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      TZ: Asia/Ho_Chi_Minh
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      # - ./backups:/backups
+    # KHÔNG mở 5432 ra internet. Bỏ comment nếu cần nối từ máy local (qua SSH tunnel).
+    ports:
+      - "127.0.0.1:5432:5432"
+    healthcheck:
+      test:
+        ['CMD-SHELL', 'pg_isready -U "${POSTGRES_USER}" -d "${POSTGRES_DB}"']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    logging:
+      driver: json-file
+      options: { max-size: '10m', max-file: '3' }
+    networks: [inchem]
+
+  # ── API NestJS ────────────────────────────────────────────
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    image: inchem-api:latest
+    container_name: inchem-api
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    # Secrets ứng dụng: JWT_SECRET, RESEND_API_KEY, MAIL_*, R2_*, CORS_ORIGINS, ADMIN_*
+    env_file:
+      - .env
+    # environment GHI ĐÈ env_file — giữ các giá trị bắt buộc ở đây cho chắc.
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      TZ: Asia/Ho_Chi_Minh
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}?schema=public
+    # Chỉ bind vào loopback — reverse proxy (Caddy/Nginx) trên host sẽ trỏ vào đây.
+    ports:
+      - '127.0.0.1:4000:4000'
+    healthcheck:
+      test: ['CMD-SHELL', 'curl -fsS http://127.0.0.1:4000/api/products >/dev/null || exit 1']
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
+    logging:
+      driver: json-file
+      options: { max-size: '10m', max-file: '3' }
+    networks: [inchem]
+
+volumes:
+  db_data:
+
+networks:
+  inchem:
+    driver: bridge

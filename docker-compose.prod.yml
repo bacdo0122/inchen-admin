@@ -19,7 +19,13 @@ services:
     volumes:
       - db_data:/var/lib/postgresql/data
       - ./backups:/backups
-    # TUYỆT ĐỐI không mở 5432 ra ngoài trên production. Cần DBeaver thì dùng SSH tunnel.
+    # Bind 127.0.0.1 — KHÔNG BAO GIỜ để "5432:5432" (dạng đó mở ra internet và
+    # Docker tự chèn iptables đứng trước ufw nên ufw deny cũng không chặn được).
+    # Chỉ process trên chính server vào được → DBeaver nối qua SSH tunnel với
+    # Host = 127.0.0.1. Không publish thì tunnel phải trỏ IP container (172.18.0.2),
+    # mà IP đó đổi mỗi lần container được tạo lại.
+    ports:
+      - '127.0.0.1:5432:5432'
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U "${POSTGRES_USER}" -d "${POSTGRES_DB}"']
       interval: 10s
