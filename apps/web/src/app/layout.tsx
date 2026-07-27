@@ -73,6 +73,9 @@ const orgJsonLd = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="vi" className={fontSans.variable}>
+      <head>
+        <meta name="google-site-verification" content="fnA0ybGgXxwMPp7Q2_90oq9Zq6Ui-UftFEFtk4JaJtY" />
+      </head>
       <body className="flex min-h-screen flex-col bg-surface font-sans antialiased">
         <script
           type="application/ld+json"
