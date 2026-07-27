@@ -263,6 +263,59 @@ docker compose -f docker-compose.prod.yml exec api ./node_modules/.bin/ts-node p
 ## Bước 9 — Backup tự động
 
 Volume nằm trên EBS của đúng một instance. Không backup là mất sạch khi hỏng.
+Có **hai lớp độc lập**, cố ý giữ cả hai:
+
+### 9a. Backup lên Cloudflare R2 — do API tự làm (lớp off-site)
+
+`BackupService` trong backend (`apps/api/src/backup/`) chạy cron **1h sáng mỗi ngày
+(giờ VN)**: `pg_dump --format=custom` → upload lên R2 → xóa bản cũ hơn
+`BACKUP_RETENTION_DAYS` (mặc định 7), nhưng **luôn chừa lại 3 bản mới nhất** để
+app chết vài ngày rồi sống lại không xóa sạch backup.
+
+Không cần cấu hình gì trên server ngoài các biến env sau trong `/opt/inchem/.env`
+(xem `.env.pro.example`):
+
+```
+BACKUP_ENABLED=true
+BACKUP_CRON=0 1 * * *
+BACKUP_RETENTION_DAYS=7
+R2_BACKUP_FOLDER=backup
+```
+
+Dùng **chung bucket `R2_BUCKET` với ảnh**, chỉ khác prefix — không cần tạo bucket
+hay API token mới. App từ chối khởi động nếu `R2_BACKUP_FOLDER` trùng `R2_FOLDER`.
+
+> **Bucket này đọc được công khai qua `R2_PUBLIC_URL`, và file dump chứa hash mật
+> khẩu admin + toàn bộ data lead khách hàng.** Vì vậy tên file có hậu tố random
+> 16 byte để không ai đoán được URL (`inchem-<stamp>-<random>.dump`) — bảo mật ở
+> đây là "không đoán được tên", không phải "không truy cập được". Đừng để lộ tên
+> file hay bật list-objects công khai. Muốn chắc chắn hơn thì chuyển sang một
+> bucket riêng không public và đổi `R2_BUCKET` của backup.
+
+Kiểm tra:
+
+```bash
+# pg_dump 16 phải có trong image api (được cài từ repo PGDG trong Dockerfile)
+docker compose -f docker-compose.prod.yml exec api pg_dump --version
+
+# chạy backup ngay, không đợi 1h sáng (cần JWT admin)
+curl -X POST https://<domain-api>/api/backup/run -H "Authorization: Bearer <JWT>"
+
+docker compose -f docker-compose.prod.yml logs api | grep -i backup
+```
+
+Restore từ file `.dump` tải về từ R2:
+
+```bash
+docker compose -f docker-compose.prod.yml exec -T db \
+  pg_restore -U "$POSTGRES_USER" -d "$POSTGRES_DB" --clean --if-exists \
+  < inchem-YYYYMMDD-HHmmss-<random>.dump
+```
+
+### 9b. Backup ra đĩa VPS — cron của host (lớp local)
+
+Chạy 2h sáng, giữ 14 ngày, ghi vào `/opt/inchem/backups`. Nhanh để rollback tại chỗ,
+nhưng nằm cùng máy với DB nên **không** thay được lớp 9a.
 
 ```bash
 mkdir -p ~/bin && tee ~/bin/backup-db.sh > /dev/null <<'EOF'
@@ -274,8 +327,7 @@ STAMP=$(date +%F-%H%M)
 docker compose -f docker-compose.prod.yml exec -T db \
   pg_dump -U "$POSTGRES_USER" "$POSTGRES_DB" | gzip > "backups/inchem-$STAMP.sql.gz"
 find backups -name 'inchem-*.sql.gz' -mtime +14 -delete
-# Đẩy lên S3 — backup nằm cùng máy với DB gần như vô nghĩa
-# aws s3 sync backups/ s3://inchem-backups/ --exclude '*' --include 'inchem-*.sql.gz'
+# Không cần sync lên object storage ở đây — bước 9a (API tự backup lên R2) đã lo.
 EOF
 chmod +x ~/bin/backup-db.sh
 

@@ -6,9 +6,19 @@
 FROM node:20-bookworm-slim AS base
 ENV PNPM_HOME=/pnpm \
     PATH=/pnpm:$PATH
-# openssl: Prisma cần; curl: healthcheck
+# openssl: Prisma cần; curl: healthcheck + tải key PGDG.
+# postgresql-client-16: cronjob backup DB gọi pg_dump. Phải lấy từ repo PGDG chứ
+# không dùng gói mặc định của bookworm (chỉ có client 15) — pg_dump cũ hơn server
+# sẽ abort với "server version mismatch", còn DB của ta là Postgres 16.
 RUN apt-get update \
     && apt-get install -y --no-install-recommends openssl ca-certificates curl \
+    && install -d /usr/share/postgresql-common/pgdg \
+    && curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc \
+         -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc \
+    && echo 'deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] http://apt.postgresql.org/pub/repos/apt bookworm-pgdg main' \
+         > /etc/apt/sources.list.d/pgdg.list \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends postgresql-client-16 \
     && rm -rf /var/lib/apt/lists/*
 RUN corepack enable && corepack prepare pnpm@10.17.1 --activate
 WORKDIR /app

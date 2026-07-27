@@ -166,18 +166,66 @@ curl -s https://1clickswaps.xyz/cdn-cgi/trace | grep -E '^(colo|ip)='
 | Đăng nhập admin xong bị đá ra | cookie `secure` mà truy cập qua HTTP | Phải vào bằng https |
 | Mọi khách bị 429 | thiếu `snippets/cloudflare-realip.conf` | `/usr/local/sbin/cloudflare-realip.sh && systemctl reload nginx` |
 
-## Đổi domain (sau này lên minhhieninchem.com.vn)
+## Đổi domain — checklist đầy đủ
 
-Tạo origin cert của zone mới rồi:
+Ví dụ chuyển `1clickswaps.xyz` → `minhhieninchem.com.vn`.
 
+### 1. Cloudflare zone mới
+- Add site, đổi nameserver ở nhà cung cấp domain, chờ zone Active.
+- 4 A record `@` / `www` / `api` / `admin` → `103.180.134.112`, **mây CAM**.
+- SSL/TLS → **Full (strict)**.
+- SSL/TLS → Origin Server → Create Certificate, hostnames
+  `minhhieninchem.com.vn, *.minhhieninchem.com.vn`. Lưu ra `/tmp/origin.{pem,key}`.
+
+Record đã proxied thì đổi A record có hiệu lực trong vài giây — không cần hạ TTL.
+
+### 2. nginx (1 lệnh, không sửa file)
 ```bash
 DOMAIN=minhhieninchem.com.vn PEM=/tmp/origin.pem KEY=/tmp/origin.key \
   bash /tmp/nginx-conf/install-domain.sh
 ```
+Cert vào `/etc/ssl/cloudflare/minhhieninchem.com.vn/` — domain cũ vẫn còn cert
+riêng, chạy song song 2 domain được nếu muốn giai đoạn chuyển tiếp.
 
-Không phải sửa conf. Nhưng **`NEXT_PUBLIC_SITE_URL` bake lúc build** → set repo
-variable rồi chạy lại workflow deploy, nếu không canonical/OG/sitemap vẫn trỏ
-domain cũ.
+### 3. GitHub repository variables — RỒI CHẠY LẠI DEPLOY
+Đây là bước duy nhất **không** chỉ cần reload: cả hai biến bake vào image lúc build.
+
+| Variable | Giá trị mới | Ảnh hưởng nếu quên |
+|---|---|---|
+| `NEXT_PUBLIC_SITE_URL` | `https://minhhieninchem.com.vn` | `metadataBase`, canonical, OG, `sitemap.xml`, `robots.txt`, JSON-LD breadcrumb đều trỏ domain cũ |
+| `API_BASE_URL` | `https://api.minhhieninchem.com.vn/api` | job build web prerender ISR bằng URL này → domain cũ chết là build fail / trang trắng |
+
+Phải là **repository**-level variable, KHÔNG phải environment `production`: job
+`build` không khai báo `environment: production` (chỉ job `deploy` có) nên biến ở
+environment sẽ không resolve lúc build.
+
+Xong thì Actions → Deploy → Run workflow (để trống `image_tag` để build lại).
+
+### 4. Fallback hardcode trong code (nên sửa cho khỏi để domain chết)
+Repo variable thắng fallback, nên không sửa cũng chạy — nhưng khi variable bị xoá
+thì site âm thầm trỏ domain cũ:
+- `apps/web/src/lib/env.ts` — 2 chỗ `'https://minhhieninchem.com.vn'`
+- `.github/workflows/deploy.yml` — `vars.API_BASE_URL || ...` và `vars.NEXT_PUBLIC_SITE_URL || ...`
+
+### 5. Trên server: `/opt/inchem/.env`
+- `CORS_ORIGINS` — nếu có set thì thêm domain mới. Để rỗng = cho mọi origin;
+  hiện web/admin gọi API server-side nên không ảnh hưởng khách.
+- `MAIL_FROM` — nếu muốn gửi từ `no-reply@<domain mới>` thì phải **verify domain
+  mới trên Resend** trước, không thì mail lead im lặng không gửi được.
+
+### 6. Không cần làm gì
+- Cookie phiên admin: `sameSite: lax` + không set `domain` → host-only, tự đúng
+  theo domain mới. Chỉ là đang đăng nhập ở domain cũ thì phải login lại.
+- Ảnh: R2 (`**.r2.dev`) không phụ thuộc domain site. Chỉ khi đổi sang custom
+  domain cho R2 mới phải thêm hostname vào `remotePatterns` của **cả**
+  `apps/web/next.config.mjs` và `apps/admin/next.config.mjs`.
+
+### 7. SEO khi domain cũ đã được index
+- Giữ zone cũ, thêm Cloudflare **Redirect Rule**: `*` → `https://<domain mới>/$1`, 301.
+- Google Search Console: thêm property mới, submit `sitemap.xml`, dùng
+  **Change of Address** từ domain cũ.
+- HSTS `max-age=31536000` đã bật: trình duyệt từng vào domain cũ sẽ ép HTTPS cho
+  domain đó trong 1 năm → redirect rule phải chạy trên HTTPS, không chỉ HTTP.
 
 ## Quay lại bộ IP
 

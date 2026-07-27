@@ -2,6 +2,7 @@ import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common
 import { ConfigService } from '@nestjs/config';
 import { DeleteObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { randomUUID } from 'node:crypto';
+import { createR2Client } from '../common/r2.util';
 
 /** Map mimetype → phần mở rộng file để đặt key an toàn. */
 const EXT_BY_MIME: Record<string, string> = {
@@ -39,32 +40,13 @@ export class UploadService {
     // R2 không cho đọc công khai qua endpoint API, nên biến này gần như bắt buộc.
     this.publicUrl = config.get<string>('R2_PUBLIC_URL') || undefined;
 
-    const accountId = config.get<string>('R2_ACCOUNT_ID');
-    const accessKeyId = config.get<string>('R2_ACCESS_KEY_ID');
-    const secretAccessKey = config.get<string>('R2_SECRET_ACCESS_KEY');
-
-    if (this.bucket && accountId && accessKeyId && secretAccessKey) {
-      this.client = new S3Client({
-        // R2 yêu cầu region cố định "auto".
-        region: 'auto',
-        endpoint: `https://${accountId}.r2.cloudflarestorage.com`,
-        // Bắt buộc path-style: nếu để virtual-hosted-style, SDK ghép bucket thành subdomain
-        // (bucket.<accountid>.r2.cloudflarestorage.com) — host 2 cấp không khớp cert wildcard
-        // *.r2.cloudflarestorage.com → TLS handshake failure (SSL alert 40).
-        forcePathStyle: true,
-        credentials: { accessKeyId, secretAccessKey },
-        // R2 chưa hỗ trợ checksum CRC mặc định của aws-sdk v3 mới → chỉ tính khi bắt buộc,
-        // tránh lỗi "not implemented" / "header you provided implies functionality not implemented".
-        requestChecksumCalculation: 'WHEN_REQUIRED',
-        responseChecksumValidation: 'WHEN_REQUIRED',
-      });
-      if (!this.publicUrl) {
-        this.logger.warn(
-          'R2_PUBLIC_URL chưa cấu hình — URL ảnh trả về sẽ không truy cập công khai được.',
-        );
-      }
-    } else {
+    this.client = this.bucket ? createR2Client(config) : null;
+    if (!this.client) {
       this.logger.warn('Cloudflare R2 chưa cấu hình — endpoint upload sẽ báo lỗi.');
+    } else if (!this.publicUrl) {
+      this.logger.warn(
+        'R2_PUBLIC_URL chưa cấu hình — URL ảnh trả về sẽ không truy cập công khai được.',
+      );
     }
   }
 
