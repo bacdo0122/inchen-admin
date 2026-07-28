@@ -5,6 +5,7 @@ import { SITE_URL } from '@/lib/env';
 import { SiteHeader } from '@/components/layout/site-header';
 import { SiteFooter } from '@/components/layout/site-footer';
 import { FloatingContact } from '@/components/layout/floating-contact';
+import { LightboxProvider } from '@/components/ui/lightbox';
 import './globals.css';
 
 /**
@@ -81,10 +82,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
         />
-        <SiteHeader />
-        <main className="flex-1">{children}</main>
-        <SiteFooter />
-        <FloatingContact />
+        {/* Provider cho lightbox zoom ảnh (sản phẩm, bảng màu) */}
+        <LightboxProvider>
+          <SiteHeader />
+          <main className="flex-1">{children}</main>
+          <SiteFooter />
+          <FloatingContact />
+        </LightboxProvider>
       </body>
     </html>
   );

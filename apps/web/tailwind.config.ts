@@ -64,9 +64,30 @@ const config: Config = {
           from: { opacity: '0', transform: 'translateY(12px)' },
           to: { opacity: '1', transform: 'translateY(0)' },
         },
+        'fade-in': {
+          from: { opacity: '0' },
+          to: { opacity: '1' },
+        },
+        'fade-out': {
+          from: { opacity: '1' },
+          to: { opacity: '0' },
+        },
+        // Lightbox: ảnh bung ra / thu về từ vị trí thumbnail vừa bấm
+        'preview-in': {
+          from: { opacity: '0', transform: 'scale(0.2)' },
+          to: { opacity: '1', transform: 'scale(1)' },
+        },
+        'preview-out': {
+          from: { opacity: '1', transform: 'scale(1)' },
+          to: { opacity: '0', transform: 'scale(0.2)' },
+        },
       },
       animation: {
         'fade-up': 'fade-up 0.5s ease-out both',
+        'fade-in': 'fade-in 0.2s ease-out both',
+        'fade-out': 'fade-out 0.2s ease-in both',
+        'preview-in': 'preview-in 0.25s cubic-bezier(0.08, 0.82, 0.17, 1) both',
+        'preview-out': 'preview-out 0.2s cubic-bezier(0.78, 0.14, 0.15, 0.86) both',
       },
     },
   },
