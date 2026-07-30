@@ -45,12 +45,27 @@ body {
 .prose-admin ul { list-style: disc; padding-left: 1.25rem; margin: 0.5em 0; }
 .prose-admin ol { list-style: decimal; padding-left: 1.25rem; margin: 0.5em 0; }
 .prose-admin a { color: hsl(var(--brand)); text-decoration: underline; }
-.prose-admin img { max-width: 100%; height: auto; border-radius: 0.5rem; margin: 0.75em 0; }
+.prose-admin img { display: block; max-width: 100%; height: auto; border-radius: 0.5rem; margin: 0.75em 0; }
+.prose-admin img[data-align='center'] { margin-left: auto; margin-right: auto; }
+.prose-admin img[data-align='right'] { margin-left: auto; margin-right: 0; }
 .prose-admin blockquote {
   border-left: 3px solid hsl(var(--border));
   padding-left: 1rem;
   color: hsl(var(--muted-fg));
   margin: 0.75em 0;
+}
+.prose-admin .video-embed {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%;
+  margin: 0.75em 0;
+}
+.prose-admin .video-embed iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 0.5rem;
 }
 
 /* Placeholder cho Tiptap khi rỗng */

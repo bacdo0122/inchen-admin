@@ -4,9 +4,12 @@ import { useRef } from 'react';
 import { useEditor, EditorContent, type Editor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
-import Image from '@tiptap/extension-image';
+import TextAlign from '@tiptap/extension-text-align';
 import Placeholder from '@tiptap/extension-placeholder';
 import {
+  AlignCenter,
+  AlignLeft,
+  AlignRight,
   Bold,
   Heading2,
   Heading3,
@@ -18,10 +21,13 @@ import {
   Quote,
   Redo,
   Undo,
+  Video,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import type { UploadResult } from '@/lib/types';
+import { VideoEmbed, toVideoEmbedUrl } from './video-embed-extension';
+import { ImageWithAlign, type ImageAlign } from './image-align-extension';
 
 function ToolbarButton({
   onClick,
@@ -83,6 +89,32 @@ function Toolbar({ editor }: { editor: Editor }) {
     }
   };
 
+  const insertVideo = () => {
+    const raw = window.prompt('Dán link video YouTube hoặc Vimeo');
+    if (!raw) return;
+    const embed = toVideoEmbedUrl(raw);
+    if (!embed) {
+      toast.error('Link video không hợp lệ. Chỉ hỗ trợ YouTube hoặc Vimeo.');
+      return;
+    }
+    editor.chain().focus().setVideoEmbed({ src: embed }).run();
+  };
+
+  const setAlign = (align: ImageAlign) => {
+    if (editor.isActive('image')) {
+      editor.chain().focus().updateAttributes('image', { align }).run();
+    } else {
+      editor.chain().focus().setTextAlign(align).run();
+    }
+  };
+
+  const isAlignActive = (align: ImageAlign) => {
+    if (editor.isActive('image')) {
+      return (editor.getAttributes('image').align ?? 'left') === align;
+    }
+    return editor.isActive({ textAlign: align });
+  };
+
   return (
     <div className="flex flex-wrap items-center gap-0.5 border-b bg-muted/40 p-1.5">
       <ToolbarButton label="Đậm" onClick={() => editor.chain().focus().toggleBold().run()} active={editor.isActive('bold')}>
@@ -117,11 +149,24 @@ function Toolbar({ editor }: { editor: Editor }) {
         <Quote className="h-4 w-4" />
       </ToolbarButton>
       <span className="mx-1 h-5 w-px bg-border" />
+      <ToolbarButton label="Căn trái" onClick={() => setAlign('left')} active={isAlignActive('left')}>
+        <AlignLeft className="h-4 w-4" />
+      </ToolbarButton>
+      <ToolbarButton label="Căn giữa" onClick={() => setAlign('center')} active={isAlignActive('center')}>
+        <AlignCenter className="h-4 w-4" />
+      </ToolbarButton>
+      <ToolbarButton label="Căn phải" onClick={() => setAlign('right')} active={isAlignActive('right')}>
+        <AlignRight className="h-4 w-4" />
+      </ToolbarButton>
+      <span className="mx-1 h-5 w-px bg-border" />
       <ToolbarButton label="Liên kết" onClick={setLink} active={editor.isActive('link')}>
         <LinkIcon className="h-4 w-4" />
       </ToolbarButton>
       <ToolbarButton label="Chèn ảnh" onClick={() => fileRef.current?.click()}>
         <ImagePlus className="h-4 w-4" />
+      </ToolbarButton>
+      <ToolbarButton label="Chèn video" onClick={insertVideo}>
+        <Video className="h-4 w-4" />
       </ToolbarButton>
       <input
         ref={fileRef}
@@ -159,7 +204,9 @@ export function RichTextEditor({
     extensions: [
       StarterKit,
       Link.configure({ openOnClick: false, autolink: true }),
-      Image,
+      TextAlign.configure({ types: ['heading', 'paragraph'] }),
+      ImageWithAlign,
+      VideoEmbed,
       Placeholder.configure({ placeholder }),
     ],
     content: value,

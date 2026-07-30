@@ -83,10 +83,19 @@ body {
   text-decoration: underline;
 }
 .prose-content img {
+  display: block;
   max-width: 100%;
   height: auto;
   border-radius: 0.75rem;
   margin: 1em 0;
+}
+.prose-content img[data-align='center'] {
+  margin-left: auto;
+  margin-right: auto;
+}
+.prose-content img[data-align='right'] {
+  margin-left: auto;
+  margin-right: 0;
 }
 .prose-content blockquote {
   border-left: 4px solid hsl(var(--brand));
@@ -94,4 +103,18 @@ body {
   color: hsl(var(--muted-fg));
   margin: 1em 0;
   font-style: italic;
+}
+.prose-content .video-embed {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%;
+  margin: 1em 0;
+}
+.prose-content .video-embed iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: 0.75rem;
 }

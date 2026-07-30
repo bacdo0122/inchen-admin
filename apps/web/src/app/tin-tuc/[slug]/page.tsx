@@ -63,7 +63,7 @@ export default async function NewsDetailPage({ params }: Params) {
           items={[{ label: 'TIN TỨC', href: '/tin-tuc' }, { label: post.title }]}
         />
 
-        <h1 className="mt-5 text-2xl font-extrabold leading-tight text-navy sm:text-4xl">
+        <h1 className="mt-5 text-2xl font-extrabold leading-tight text-navy sm:text-4xl text-center">
           {post.title}
         </h1>
         {post.publishedAt && (
