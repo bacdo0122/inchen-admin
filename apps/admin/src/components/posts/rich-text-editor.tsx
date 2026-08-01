@@ -15,6 +15,7 @@ import {
   Heading3,
   ImagePlus,
   Italic,
+  Pencil,
   Link as LinkIcon,
   List,
   ListOrdered,
@@ -83,10 +84,18 @@ function Toolbar({ editor }: { editor: Editor }) {
       if (!res.ok || !('url' in data)) {
         throw new Error(('message' in data && data.message) || 'Upload thất bại');
       }
-      editor.chain().focus().setImage({ src: data.url }).run();
+      const alt = window.prompt('Mô tả ảnh (alt text, giúp SEO và người dùng khiếm thị)') ?? '';
+      editor.chain().focus().setImage({ src: data.url, alt: alt.trim() || undefined }).run();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Không chèn được ảnh');
     }
+  };
+
+  const setImageAlt = () => {
+    const prev = (editor.getAttributes('image').alt as string | undefined) ?? '';
+    const alt = window.prompt('Mô tả ảnh (alt text)', prev);
+    if (alt === null) return;
+    editor.chain().focus().updateAttributes('image', { alt: alt.trim() || null }).run();
   };
 
   const insertVideo = () => {
@@ -165,6 +174,11 @@ function Toolbar({ editor }: { editor: Editor }) {
       <ToolbarButton label="Chèn ảnh" onClick={() => fileRef.current?.click()}>
         <ImagePlus className="h-4 w-4" />
       </ToolbarButton>
+      {editor.isActive('image') && (
+        <ToolbarButton label="Sửa mô tả ảnh (alt text)" onClick={setImageAlt}>
+          <Pencil className="h-4 w-4" />
+        </ToolbarButton>
+      )}
       <ToolbarButton label="Chèn video" onClick={insertVideo}>
         <Video className="h-4 w-4" />
       </ToolbarButton>

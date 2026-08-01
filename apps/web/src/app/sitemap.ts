@@ -14,17 +14,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }),
   );
 
-  let postRoutes: MetadataRoute.Sitemap = [];
+  const postRoutes: MetadataRoute.Sitemap = [];
   try {
-    const posts = await getPosts(1, 100);
-    postRoutes = posts.items.map((p) => ({
-      url: `${SITE_URL}/tin-tuc/${p.slug}`,
-      lastModified: p.updatedAt ? new Date(p.updatedAt) : new Date(),
-      changeFrequency: 'monthly' as const,
-      priority: 0.6,
-    }));
+    const pageSize = 100;
+    let page = 1;
+    let totalPages = 1;
+    do {
+      const posts = await getPosts(page, pageSize);
+      totalPages = posts.totalPages;
+      postRoutes.push(
+        ...posts.items.map((p) => ({
+          url: `${SITE_URL}/tin-tuc/${p.slug}`,
+          lastModified: p.updatedAt ? new Date(p.updatedAt) : new Date(),
+          changeFrequency: 'monthly' as const,
+          priority: 0.6,
+        })),
+      );
+      page += 1;
+    } while (page <= totalPages);
   } catch {
-    postRoutes = [];
+    postRoutes.length = 0;
   }
 
   return [...staticRoutes, ...postRoutes];

@@ -9,19 +9,30 @@ import { Pagination } from '@/components/ui/pagination';
 
 export const revalidate = 30;
 
-export const metadata: Metadata = {
-  title: 'Tin tức & sự kiện',
-  description:
-    'Tin tức, kiến thức và sự kiện mới nhất về sơn gỗ INCHEM, Sherwin-Williams và Minh Hiền.',
-  alternates: { canonical: '/tin-tuc' },
-};
+type SearchParams = Promise<{ page?: string }>;
+
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}): Promise<Metadata> {
+  const { page: pageParam } = await searchParams;
+  const page = Math.max(1, Number(pageParam) || 1);
+
+  return {
+    title: 'Tin tức & sự kiện',
+    description:
+      'Tin tức, kiến thức và sự kiện mới nhất về sơn gỗ INCHEM, Sherwin-Williams và Minh Hiền.',
+    alternates: { canonical: page <= 1 ? '/tin-tuc' : `/tin-tuc?page=${page}` },
+  };
+}
 
 const PAGE_SIZE = 9;
 
 export default async function NewsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string }>;
+  searchParams: SearchParams;
 }) {
   const { page: pageParam } = await searchParams;
   const page = Math.max(1, Number(pageParam) || 1);
