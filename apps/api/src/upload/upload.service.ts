@@ -2,7 +2,9 @@ import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common
 import { ConfigService } from '@nestjs/config';
 import { DeleteObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { randomUUID } from 'node:crypto';
+import { basename, extname } from 'node:path';
 import { createR2Client } from '../common/r2.util';
+import { slugify } from '../common/slug.util';
 
 /** Map mimetype → phần mở rộng file để đặt key an toàn. */
 const EXT_BY_MIME: Record<string, string> = {
@@ -56,7 +58,7 @@ export class UploadService {
     }
 
     const ext = EXT_BY_MIME[file.mimetype] ?? 'bin';
-    const key = `${this.folder}/${randomUUID()}.${ext}`;
+    const key = `${this.folder}/${this.buildFileSlug(file.originalname)}-${randomUUID().slice(0, 8)}.${ext}`;
     try {
       await this.client.send(
         new PutObjectCommand({
@@ -147,6 +149,15 @@ export class UploadService {
 
     // Đã là key thuần.
     return value.replace(/^\/+/, '');
+  }
+
+  /**
+   * Sinh phần tên file từ tên gốc admin upload — giữ từ khóa (SEO Google Images)
+   * thay vì chỉ dùng UUID ngẫu nhiên. Hậu tố random ngắn ở nơi gọi đảm bảo duy nhất.
+   */
+  private buildFileSlug(originalname: string): string {
+    const nameOnly = basename(originalname, extname(originalname));
+    return slugify(nameOnly).slice(0, 60) || 'anh';
   }
 
   /** Dựng URL công khai của object từ R2_PUBLIC_URL (r2.dev hoặc custom domain). */

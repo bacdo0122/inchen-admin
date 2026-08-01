@@ -32,6 +32,12 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
       ...(post.thumbnail ? { images: [{ url: post.thumbnail }] } : {}),
       ...(post.publishedAt ? { publishedTime: post.publishedAt } : {}),
     },
+    twitter: {
+      card: 'summary_large_image',
+      title: post.title,
+      description,
+      ...(post.thumbnail ? { images: [post.thumbnail] } : {}),
+    },
   };
 }
 
