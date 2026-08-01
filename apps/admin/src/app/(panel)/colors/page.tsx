@@ -1,11 +1,13 @@
 import Image from 'next/image';
 import { Palette, Pencil, Plus } from 'lucide-react';
 import { COLOR_TONE_LABEL } from '@inchem/shared';
+import type { Paginated } from '@inchem/shared';
 import { apiFetch } from '@/lib/api';
 import { PageHeader } from '@/components/ui/page-header';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { EmptyState } from '@/components/ui/empty-state';
+import { Pagination } from '@/components/ui/pagination';
 import { SelectFilter } from '@/components/shared/table-filters';
 import { ColorFormModal } from '@/components/colors/color-form-modal';
 import { DeleteColorButton } from '@/components/colors/delete-color-button';
@@ -18,18 +20,20 @@ const toneOptions = Object.entries(COLOR_TONE_LABEL).map(([value, label]) => ({ 
 export default async function ColorsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ tone?: string }>;
+  searchParams: Promise<{ tone?: string; page?: string }>;
 }) {
-  const { tone } = await searchParams;
-  const sp = new URLSearchParams();
+  const { tone, page: pageParam } = await searchParams;
+  const page = Math.max(1, Number(pageParam) || 1);
+
+  const sp = new URLSearchParams({ page: String(page), pageSize: '20' });
   if (tone) sp.set('tone', tone);
-  const colors = await apiFetch<Color[]>(`/colors${sp.toString() ? `?${sp}` : ''}`);
+  const data = await apiFetch<Paginated<Color>>(`/colors?${sp.toString()}`);
 
   return (
     <>
       <PageHeader
         title="Bảng màu"
-        description={`${colors.length} mẫu màu`}
+        description={`${data.total} mẫu màu`}
         action={
           <ColorFormModal
             trigger={
@@ -46,38 +50,42 @@ export default async function ColorsPage({
         <SelectFilter paramKey="tone" options={toneOptions} allLabel="Tất cả tông màu" />
       </div>
 
-      {colors.length === 0 ? (
+      {data.items.length === 0 ? (
         <EmptyState
           icon={Palette}
           title={tone ? 'Không có màu ở tông này' : 'Chưa có mẫu màu nào'}
           description="Thêm mẫu màu để hiển thị trong bảng màu trên website."
         />
       ) : (
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-          {colors.map((color) => (
-            <Card key={color.id} className="overflow-hidden">
-              <div className="relative aspect-video bg-muted" style={color.hex && !color.image ? { backgroundColor: color.hex } : undefined}>
-                {color.image && <Image src={color.image} alt={color.code} fill className="object-cover" sizes="200px" unoptimized />}
-              </div>
-              <div className="space-y-1.5 p-3">
-                <div className="flex items-center justify-between gap-2">
-                  <p className="truncate font-mono text-sm font-semibold text-fg" title={color.code}>
-                    {color.code}
-                  </p>
-                  <Badge tone="neutral">{COLOR_TONE_LABEL[color.tone]}</Badge>
+        <>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+            {data.items.map((color) => (
+              <Card key={color.id} className="overflow-hidden">
+                <div className="relative aspect-video bg-muted" style={color.hex && !color.image ? { backgroundColor: color.hex } : undefined}>
+                  {color.image && <Image src={color.image} alt={color.code} fill className="object-cover" sizes="200px" unoptimized />}
                 </div>
-                <div className="flex items-center justify-end gap-1 pt-1">
-                  <ColorFormModal
-                    color={color}
-                    trigger={<Pencil className="h-4 w-4" />}
-                    triggerProps={{ variant: 'ghost', size: 'icon', 'aria-label': 'Sửa' }}
-                  />
-                  <DeleteColorButton id={color.id} code={color.code} />
+                <div className="space-y-1.5 p-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="truncate font-mono text-sm font-semibold text-fg" title={color.code}>
+                      {color.code}
+                    </p>
+                    <Badge tone="neutral">{COLOR_TONE_LABEL[color.tone]}</Badge>
+                  </div>
+                  <div className="flex items-center justify-end gap-1 pt-1">
+                    <ColorFormModal
+                      color={color}
+                      trigger={<Pencil className="h-4 w-4" />}
+                      triggerProps={{ variant: 'ghost', size: 'icon', 'aria-label': 'Sửa' }}
+                    />
+                    <DeleteColorButton id={color.id} code={color.code} />
+                  </div>
                 </div>
-              </div>
-            </Card>
-          ))}
-        </div>
+              </Card>
+            ))}
+          </div>
+
+          <Pagination page={data.page} totalPages={data.totalPages} pathname="/colors" params={{ tone }} />
+        </>
       )}
     </>
   );

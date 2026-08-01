@@ -33,7 +33,7 @@ async function safe<T>(p: Promise<T>, fallback: T): Promise<T> {
 
 export default async function HomePage() {
   const [colors, posts] = await Promise.all([
-    safe(getColors(), []),
+    safe(getColors(1, 8), { items: [], total: 0, page: 1, pageSize: 8, totalPages: 1 }),
     safe(getPosts(1, 8), { items: [], total: 0, page: 1, pageSize: 8, totalPages: 1 }),
   ]);
 
@@ -126,7 +126,7 @@ export default async function HomePage() {
       </section>
 
       {/* Bộ sưu tập màu sắc */}
-      {colors.length > 0 && (
+      {colors.items.length > 0 && (
         <section className="bg-section py-16 lg:py-20">
           <Container>
             <SectionHeading
@@ -139,7 +139,7 @@ export default async function HomePage() {
               subtitle="Khám phá đa dạng tông màu phù hợp mọi phong cách nội thất gỗ hiện đại."
             />
             <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-              {colors.slice(0, 8).map((c) => (
+              {colors.items.map((c) => (
                 <ColorCard key={c.id} color={c} />
               ))}
             </div>

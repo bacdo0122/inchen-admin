@@ -14,9 +14,10 @@ export async function getProducts(): Promise<Product[]> {
   return res.items;
 }
 
-export function getColors(tone?: string): Promise<Color[]> {
-  const qs = tone ? `?tone=${encodeURIComponent(tone)}` : '';
-  return apiGet<Color[]>(`/colors${qs}`);
+export function getColors(page = 1, pageSize = 16, tone?: string): Promise<Paginated<Color>> {
+  const sp = new URLSearchParams({ page: String(page), pageSize: String(pageSize) });
+  if (tone) sp.set('tone', tone);
+  return apiGet<Paginated<Color>>(`/colors?${sp}`);
 }
 
 export function getPosts(page = 1, pageSize = 9): Promise<Paginated<Post>> {

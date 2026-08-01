@@ -22,7 +22,7 @@ export class ColorsController {
   constructor(private readonly colors: ColorsService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Danh sách màu (public), lọc theo tông' })
+  @ApiOperation({ summary: 'Danh sách màu (public), lọc theo tông + phân trang' })
   findAll(@Query() query: QueryColorDto) {
     return this.colors.findAll(query);
   }

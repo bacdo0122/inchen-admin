@@ -1,13 +1,11 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
-import Link from 'next/link';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { getPosts } from '@/lib/data';
 import { Container } from '@/components/ui/container';
 import { PageBanner } from '@/components/layout/page-banner';
 import { NewsCard } from '@/components/news/news-card';
 import { EmptyNote } from '@/components/ui/empty-note';
-import { cn } from '@/lib/utils';
+import { Pagination } from '@/components/ui/pagination';
 
 export const revalidate = 30;
 
@@ -66,7 +64,7 @@ export default async function NewsPage({
                   <NewsCard key={post.id} post={post} />
                 ))}
               </div>
-              <Pagination page={data.page} totalPages={data.totalPages} />
+              <Pagination page={data.page} totalPages={data.totalPages} basePath="/tin-tuc" />
             </>
           ) : (
             <EmptyNote>Chưa có bài viết nào. Vui lòng quay lại sau.</EmptyNote>
@@ -74,52 +72,5 @@ export default async function NewsPage({
         </Container>
       </section>
     </>
-  );
-}
-
-function Pagination({ page, totalPages }: { page: number; totalPages: number }) {
-  if (totalPages <= 1) return null;
-  const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
-  const href = (p: number) => (p <= 1 ? '/tin-tuc' : `/tin-tuc?page=${p}`);
-
-  return (
-    <nav className="mt-12 flex items-center justify-center gap-2" aria-label="Phân trang">
-      <PageLink href={href(page - 1)} disabled={page <= 1} aria-label="Trang trước">
-        <ChevronLeft className="size-4" />
-      </PageLink>
-      {pages.map((p) => (
-        <PageLink key={p} href={href(p)} active={p === page}>
-          {p}
-        </PageLink>
-      ))}
-      <PageLink href={href(page + 1)} disabled={page >= totalPages} aria-label="Trang sau">
-        <ChevronRight className="size-4" />
-      </PageLink>
-    </nav>
-  );
-}
-
-function PageLink({
-  href,
-  active,
-  disabled,
-  children,
-  ...rest
-}: {
-  href: string;
-  active?: boolean;
-  disabled?: boolean;
-  children: React.ReactNode;
-} & React.ComponentProps<typeof Link>) {
-  const cls = cn(
-    'inline-flex h-10 min-w-10 items-center justify-center rounded-lg px-3 text-sm font-semibold transition',
-    active ? 'bg-indigo text-white' : 'bg-white text-navy shadow-sm hover:bg-muted',
-    disabled && 'pointer-events-none opacity-40',
-  );
-  if (disabled) return <span className={cls}>{children}</span>;
-  return (
-    <Link href={href} className={cls} {...rest}>
-      {children}
-    </Link>
   );
 }

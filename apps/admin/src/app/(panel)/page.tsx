@@ -18,14 +18,14 @@ async function getData() {
     apiFetch<Paginated<Lead>>('/leads?pageSize=5'),
     apiFetch<Paginated<Post>>('/posts/admin/all?pageSize=1'),
     apiFetch<Paginated<Product>>('/products/admin/all?pageSize=1'),
-    apiFetch<Color[]>('/colors'),
+    apiFetch<Paginated<Color>>('/colors?pageSize=1'),
   ]);
   return {
     newLeads: countNew.count,
     recentLeads: recentLeads.items,
     totalPosts: posts.total,
     totalProducts: products.total,
-    totalColors: colors.length,
+    totalColors: colors.total,
   };
 }
 

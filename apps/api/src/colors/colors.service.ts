@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { paginated } from '../common/dto/pagination.dto';
 import { CreateColorDto } from './dto/create-color.dto';
 import { UpdateColorDto } from './dto/update-color.dto';
 import { QueryColorDto } from './dto/query-color.dto';
@@ -13,12 +14,18 @@ export class ColorsService {
     private readonly upload: UploadService,
   ) {}
 
-  findAll(query: QueryColorDto) {
+  async findAll(query: QueryColorDto) {
     const where: Prisma.ColorWhereInput = query.tone ? { tone: query.tone } : {};
-    return this.prisma.color.findMany({
-      where,
-      orderBy: [{ order: 'asc' }, { createdAt: 'asc' }],
-    });
+    const [items, total] = await this.prisma.$transaction([
+      this.prisma.color.findMany({
+        where,
+        orderBy: [{ order: 'asc' }, { createdAt: 'asc' }],
+        skip: query.skip,
+        take: query.pageSize,
+      }),
+      this.prisma.color.count({ where }),
+    ]);
+    return paginated(items, total, query.page, query.pageSize);
   }
 
   async findOne(id: string) {
