@@ -20,6 +20,7 @@ const nextConfig = {
     remotePatterns: [
       { protocol: 'https', hostname: '**.r2.dev' },
       { protocol: 'https', hostname: 'res.cloudinary.com' },
+      { protocol: 'https', hostname: 'resouce.minhhieninchem.com.vn' },
     ],
   },
 };
