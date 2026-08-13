@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import { Wrench } from 'lucide-react';
+import { COMPANY } from '@inchem/shared';
+import { SITE_URL } from '@/lib/env';
 import { Container } from '@/components/ui/container';
 import { PageBanner } from '@/components/layout/page-banner';
 import { LeadForm } from '@/components/contact/lead-form';
@@ -12,6 +14,24 @@ export const metadata: Metadata = {
   alternates: { canonical: '/lien-he' },
 };
 
+const contactJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ContactPage',
+  url: `${SITE_URL}/lien-he`,
+  about: {
+    '@type': 'LocalBusiness',
+    name: COMPANY.name,
+    email: COMPANY.email,
+    contactPoint: COMPANY.hotline.map((tel) => ({
+      '@type': 'ContactPoint',
+      telephone: tel,
+      contactType: 'customer service',
+      areaServed: 'VN',
+      availableLanguage: 'Vietnamese',
+    })),
+  },
+};
+
 const SERVICES = [
   'Tư vấn lựa chọn hệ sơn phù hợp',
   'Hướng dẫn quy trình thi công',
@@ -22,6 +42,10 @@ const SERVICES = [
 export default function ContactPage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(contactJsonLd) }}
+      />
       <PageBanner
         crumb={[{ label: 'LIÊN HỆ' }]}
         title="Liên Hệ Với Chúng Tôi"

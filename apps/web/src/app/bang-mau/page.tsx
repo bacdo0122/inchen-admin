@@ -9,19 +9,30 @@ import { Pagination } from '@/components/ui/pagination';
 
 export const revalidate = 30;
 
-export const metadata: Metadata = {
-  title: 'Bảng màu sơn gỗ INCHEM',
-  description:
-    'Bộ sưu tập màu sắc sơn gỗ INCHEM đa dạng tông ấm, sáng, tối, lạnh — phù hợp mọi phong cách nội thất gỗ.',
-  alternates: { canonical: '/bang-mau' },
-};
+type SearchParams = Promise<{ page?: string }>;
+
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}): Promise<Metadata> {
+  const { page: pageParam } = await searchParams;
+  const page = Math.max(1, Number(pageParam) || 1);
+
+  return {
+    title: 'Bảng màu sơn gỗ INCHEM',
+    description:
+      'Bộ sưu tập màu sắc sơn gỗ INCHEM đa dạng tông ấm, sáng, tối, lạnh — phù hợp mọi phong cách nội thất gỗ.',
+    alternates: { canonical: page <= 1 ? '/bang-mau' : `/bang-mau?page=${page}` },
+  };
+}
 
 const PAGE_SIZE = 16;
 
 export default async function ColorsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string }>;
+  searchParams: SearchParams;
 }) {
   const { page: pageParam } = await searchParams;
   const page = Math.max(1, Number(pageParam) || 1);

@@ -20,14 +20,16 @@ const fontSans = Be_Vietnam_Pro({
   display: 'swap',
 });
 
+const SITE_DESCRIPTION =
+  'Minh Hiền - Sơn PU, NC, UV, sơn hệ nước cao cấp cho nội thất gỗ. Tư vấn phối màu, báo giá nhanh.';
+
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
     default: 'Sơn gỗ INCHEM (Sherwin-Williams) — Minh Hiền | Nhà phân phối miền Bắc',
     template: '%s | Sơn INCHEM Minh Hiền',
   },
-  description:
-    'Minh Hiền - Sơn PU, NC, UV, sơn hệ nước cao cấp cho nội thất gỗ. Tư vấn phối màu, báo giá nhanh.',
+  description: SITE_DESCRIPTION,
   keywords: [
     'sơn gỗ INCHEM',
     'sơn PU miền Bắc',
@@ -41,14 +43,12 @@ export const metadata: Metadata = {
     siteName: COMPANY.shortName,
     url: SITE_URL,
     title: 'Sơn gỗ INCHEM (Sherwin-Williams) — Minh Hiền',
-    description:
-      '',
+    description: SITE_DESCRIPTION,
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Sơn gỗ INCHEM (Sherwin-Williams) — Minh Hiền',
-    description:
-      '',
+    description: SITE_DESCRIPTION,
   },
   robots: { index: true, follow: true },
 };
@@ -62,12 +62,22 @@ const orgJsonLd = {
   email: COMPANY.email,
   telephone: COMPANY.hotline,
   url: SITE_URL,
+  logo: `${SITE_URL}/brand/logo-mh.png`,
+  image: `${SITE_URL}/brand/anh_thong_tin_mh.png`,
   address: {
     '@type': 'PostalAddress',
     streetAddress: COMPANY.address,
     addressRegion: 'Hà Nội',
     addressCountry: 'VN',
   },
+  // Toạ độ lấy từ link Google Maps thật (COMPANY.map) — giúp đủ điều kiện
+  // hiển thị trên Google Maps/Local Pack khi tìm kiếm gần vị trí công ty.
+  geo: {
+    '@type': 'GeoCoordinates',
+    latitude: 21.0689776,
+    longitude: 105.955061,
+  },
+  hasMap: COMPANY.map,
   sameAs: [COMPANY.facebook, COMPANY.youtube, COMPANY.tiktok].filter(Boolean),
 };
 
